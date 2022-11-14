@@ -1,9 +1,27 @@
-import { Server } from "socket.io";
+require('dotenv').config();
+const cors = require("cors");
+const express = require("express");
+const mainRouter = require( "./routes" );
 
-const io = new Server({ /* options */ });
+const app = express();
 
-io.on("connection", (socket) => {
-    
-});
-console.log("listening on port 3000");
-io.listen(3000);
+app.use(
+	cors({
+		origin: "http://localhost:8000",
+		credentials: true
+	})
+)
+app.use(express.json());
+app.use(
+	express.urlencoded({
+		extended: true,
+	})
+);
+
+app.use("/", mainRouter);
+
+// app.use((req, res, next) => {
+//     return res.sendStatus(500);
+// })
+
+module.exports = app;
