@@ -5,12 +5,29 @@ docker-compose up -d
 
 ```
 
-
-
-## Commandes utiles & install and run client
+## Installation
+client :
 ```bash
 docker-compose exec node npm run install:client
+```
+server :
+```bash
+server : docker-compose exec node npm run install:server
+```
+
+## Development
+client :
+```bash
 docker-compose exec node npm run dev:client
+```
+server:
+```bash
+docker-compose exec node npm run dev:server
+```
+
+## Migration BDD
+```bash
+docker-compose exec node npm run migrate
 ```
 
 
