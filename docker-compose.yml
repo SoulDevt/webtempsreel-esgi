@@ -25,8 +25,8 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:password@db:5432/chatbot
     ports:
-      - 8000:8000
-      - 9000:9000
+      - ${PORT_CLIENT-8000}:${PORT_CLIENT-8000}
+      - ${PORT_SERVER-9000}:${PORT_SERVER-9000}
     volumes:
       - .:/home/node
   
