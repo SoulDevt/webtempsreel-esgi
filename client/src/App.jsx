@@ -3,13 +3,14 @@ import { Route, Routes } from 'react-router-dom'
 import { Home, Error } from './pages';
 import { io } from 'socket.io-client';
 
+const socket = io(`http://${process.env.HOST||'localhost'}:${process.env.PORT_SERVER || 9000}`);
+
 const App = () => {
   useEffect(() => {
-    const socket = io('ws://localhost:9000');
     socket.on("connect", () => {
       console.log('client conectado');
     });
-  }, []);
+  }, [socket]);
   return (
     <Routes>
       <Route path="/" element={<Home />} />
