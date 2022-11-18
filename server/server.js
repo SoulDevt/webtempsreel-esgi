@@ -1,27 +1,29 @@
-require('dotenv').config();
-const cors = require("cors");
+require("dotenv").config();
 const express = require("express");
-const mainRouter = require( "./routes" );
+const http = require("http");
+const { Server } = require("socket.io");
+
+const mainRouter = require("./routes");
 
 const app = express();
 
-app.use(
-	cors({
-		origin: "http://localhost:8000",
-		credentials: true
-	})
-)
-app.use(express.json());
-app.use(
-	express.urlencoded({
-		extended: true,
-	})
-);
+app.use(mainRouter);
 
-app.use("/", mainRouter);
+const server = http.createServer(app);
+
+const io = new Server(server, {
+	cors: {
+		origin: "http://localhost:8000",
+		methods: ["GET", "POST"],
+	},
+});
+
+io.on("connection", () => {
+  console.log("New client connected");
+});
 
 // app.use((req, res, next) => {
 //     return res.sendStatus(500);
 // })
 
-module.exports = app;
+module.exports = server;
