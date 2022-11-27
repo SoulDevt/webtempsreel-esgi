@@ -12,7 +12,7 @@ docker-compose exec node npm run install:client
 ```
 server :
 ```bash
-server : docker-compose exec node npm run install:server
+docker-compose exec node npm run install:server
 ```
 
 ## Development
