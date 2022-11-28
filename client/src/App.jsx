@@ -1,10 +1,13 @@
 import { useEffect, useMemo } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Home, Error, Login } from './pages';
+import { Nav } from './components';
 import { io } from 'socket.io-client';
+import { serverUrl } from './enums';
+
+const { Home, Error, Login, Test } = lazy(() => import('./pages'));
 
 const App = () => {
-  const socket = useMemo(() => io(`http://${process.env.HOST || 'localhost'}:${process.env.PORT_SERVER || 9000}`), []);
+  const socket = useMemo(() => io(serverUrl), []);
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -15,11 +18,15 @@ const App = () => {
     };
   }, [socket]);
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/" element={<Login />} />
-      <Route path="*" element={<Error />} />
-    </Routes>
+    <>
+      <Nav />
+      <Routes>
+        <Route exact path="/" element={<Home />} />
+        <Route path="/test" element={<Test />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Error />} />
+      </Routes>
+    </>
   );
 };
 

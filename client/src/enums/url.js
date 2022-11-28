@@ -1,0 +1,1 @@
+export const serverUrl = `http://${process.env.HOST || 'localhost'}:${process.env.PORT_SERVER || 9000}`;
