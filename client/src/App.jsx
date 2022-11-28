@@ -1,10 +1,14 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Nav } from './components';
 import { io } from 'socket.io-client';
 import { serverUrl } from './enums';
 
-const { Home, Error, Login, Test } = lazy(() => import('./pages'));
+const Home = lazy(() => import('./pages/Home'));
+const Error = lazy(() => import('./pages/Error'));
+const Login = lazy(() => import('./pages/Login'));
+const Test = lazy(() => import('./pages/Test'));
+const Loader = lazy(() => import('./components/Loader'));
 
 const App = () => {
   const socket = useMemo(() => io(serverUrl), []);
@@ -18,7 +22,7 @@ const App = () => {
     };
   }, [socket]);
   return (
-    <>
+    <Suspense fallback={<Loader/>}>
       <Nav />
       <Routes>
         <Route exact path="/" element={<Home />} />
@@ -26,7 +30,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Error />} />
       </Routes>
-    </>
+    </Suspense>
   );
 };
 
