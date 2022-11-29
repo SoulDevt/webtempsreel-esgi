@@ -10,6 +10,9 @@ export default defineConfig(({ command, mode }) => {
       port: env.PORT_CLIENT || 8000,
       host: "0.0.0.0",
     },
+    watch: {
+      usePolling: true,
+    },
     define: {
       "process.env": env,
     }
