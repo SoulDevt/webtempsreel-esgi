@@ -13,7 +13,7 @@ const Test = () => {
     source.addEventListener('notification', (e) => {
       
       const { data } = JSON.parse(e.data);
-      console.log(data, 'data');
+      //TODO : handle status
       if (data?.status) {
         setTest(data);
       }
@@ -64,7 +64,8 @@ const Test = () => {
         {formData.titre} {formData.message}
         <button type="submit">Submit</button>
       </form>
-      {/* {test && <p>{test}</p>} */}
+      <p>{ test && test.titre }</p>
+      <p>{ test && test.message }</p>
     </div>
   );
 };
