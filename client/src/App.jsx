@@ -22,7 +22,7 @@ const App = () => {
     };
   }, [socket]);
   return (
-    <Suspense fallback={<Loader/>}>
+    <Suspense fallback={<Loader />}>
       <Nav />
       <Routes>
         <Route exact path="/" element={<Home />} />

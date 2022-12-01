@@ -12,6 +12,8 @@ services:
       - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data:rw
+    networks:
+      - backend
 
   node:
     image: node:18.0.0-alpine
@@ -29,6 +31,8 @@ services:
       - ${PORT_SERVER-9000}:${PORT_SERVER-9000}
     volumes:
       - .:/home/node
+    networks:
+      - backend
   
   adminer:
     depends_on:
@@ -39,3 +43,7 @@ services:
 
 volumes:
   db-data: {}
+
+networks:
+  backend:
+    name: backend
