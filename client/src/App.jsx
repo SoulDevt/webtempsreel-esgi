@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { Nav } from './components';
 import { io } from 'socket.io-client';
 import { serverUrl } from './enums';
-import { Loader, Toast } from "./components";
+import { Loader } from './components';
 
 const Home = lazy(() => import('./pages/Home'));
 const Error = lazy(() => import('./pages/Error'));
@@ -23,7 +23,6 @@ const App = () => {
   }, [socket]);
   return (
     <Suspense fallback={<Loader />}>
-      <Toast/>
       <Nav />
       <Routes>
         <Route exact path="/" element={<Home />} />

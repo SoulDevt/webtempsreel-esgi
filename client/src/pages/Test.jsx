@@ -1,21 +1,45 @@
 import { useEffect, useCallback, useState } from 'react';
 import { serverUrl } from '../enums';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
+import { Toast } from '../components';
 
 const Test = () => {
-  const [formData, setFormData] = useState({ titre: '', message: '' });
-  const [test, setTest] = useState(null);
+  const [formData, setFormData] = useState({ titre: '', message: '', status: 'empty' });
 
   useEffect(() => {
     const source = new EventSource(`${serverUrl}/sse/notification`);
     source.addEventListener('open', () => {
       console.log('SSE opened!');
     });
-    source.addEventListener('notification', (e) => {
-      
+    source.addEventListener('notification', async (e) => {
       const { data } = JSON.parse(e.data);
-      //TODO : handle status
-      if (data?.status) {
-        setTest(data);
+      if (data?.status === 'new') {
+        const content = <Toast titre={data?.titre} message={data?.message} />;
+        toast(content, {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light'
+        });
+        setFormData({ titre: '', message: '', status: 'empty' });
+        try {
+          let res = await fetch(`${serverUrl}/sse/notification`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+          // let data = await res.json();
+          // console.log(data);
+        } catch (error) {
+          console.log(error);
+        }
       }
     });
 
@@ -42,7 +66,7 @@ const Test = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify({...formData, status: 'new'})
         });
         // let data = await res.json();
         // console.log(data);
@@ -54,19 +78,20 @@ const Test = () => {
   );
 
   return (
-    <div className="Test container mx-auto px-4 flex flex-col justify-center items-center">
-      <h1>Test sse</h1>
-      <form className="flex flex-col" onSubmit={handleSubmit}>
-        <label htmlFor="titre">Titre</label>
-        <input id="titre" name="titre" type="text" onChange={handleChange} />
-        <label htmlFor="message">Message</label>
-        <input id="message" name="message" type="text" onChange={handleChange} />
-        {formData.titre} {formData.message}
-        <button type="submit">Submit</button>
-      </form>
-      <p>{ test && test.titre }</p>
-      <p>{ test && test.message }</p>
-    </div>
+    <>
+      <ToastContainer />
+      <div className="Test container mx-auto px-4 flex flex-col justify-center items-center">
+        <h1>Test sse</h1>
+        <form className="flex flex-col" onSubmit={handleSubmit}>
+          <label htmlFor="titre">Titre</label>
+          <input id="titre" name="titre" type="text" value={formData.titre} onChange={handleChange} />
+          <label htmlFor="message">Message</label>
+          <input id="message" name="message" type="text" value={formData.message} onChange={handleChange} />
+          {formData.titre} {formData.message}
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </>
   );
 };
 
