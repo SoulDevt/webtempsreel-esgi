@@ -1,1 +1,0 @@
-exports.SseHelpers = require('./sse');
