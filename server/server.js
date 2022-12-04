@@ -1,11 +1,13 @@
 require("dotenv").config();
 const express = require("express");
+const compression = require("compression");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
 const mainRouter = require("./routes");
 
 const app = express();
+app.use(compression());
 app.use(
   cors({
     origin: "http://localhost:8000",
