@@ -15,6 +15,7 @@ const Notification = lazy(() => import('./pages/Notification'));
 const App = () => {
   const socket = useMemo(() => io(serverUrl), []);
   const [listenning, setListenning] = useState(false);
+  const [nbConnexion, setNbConnexion] = useState(1)
 
   useEffect(() => {
     const source = new EventSource(`${serverUrl}/stream`, { withCredentials: true });
@@ -27,13 +28,20 @@ const App = () => {
         console.log('SSE opened!');
       });
 
-      source.addEventListener('notification', async (e) => {
+      source.addEventListener('notification', (e) => {
         const { data } = JSON.parse(e.data);
         if (data.status === 'created') {
           toast(<Toast titre={data?.titre} message={data?.message} />, {
             theme: 'dark'
           });
         }
+      });
+
+      source.addEventListener('nb-connexion', (e) => {
+        const data = JSON.parse(e.data);
+        if(data.nbConnexion && data.nbConnexion !== nbConnexion)
+          setNbConnexion(data.nbConnexion)
+   
       });
 
       source.addEventListener('error', (error) => {
@@ -60,7 +68,7 @@ const App = () => {
       <ToastContainer />
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route path="/notification" element={<Notification />} />
+        <Route path="/notification" element={<Notification nbConnexion={nbConnexion} />} />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Error />} />
       </Routes>

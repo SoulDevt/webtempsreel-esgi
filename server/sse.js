@@ -17,4 +17,4 @@ const sendEvent = ({ type, data }, connexionList) => {
   }
 };
 
-module.exports = { sendEvent };
+module.exports = { sendEvent, convertMessage };

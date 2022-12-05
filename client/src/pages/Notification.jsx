@@ -3,7 +3,7 @@ import { serverUrl } from '../enums';
 import { toast } from 'react-toastify';
 import { StrHelper } from '../helpers';
 
-const Notification = () => {
+const Notification = ({nbConnexion}) => {
   const [formData, setFormData] = useState({ titre: '', message: '' });
   const [error, setError] = useState(null);
 
@@ -40,6 +40,7 @@ const Notification = () => {
     <>
       <div className="Notification container mx-auto px-4 flex flex-col justify-center items-center">
         <h1>Envoyer une notification</h1>
+        <h2>Il y a actuellement : {nbConnexion} personnes connectés</h2>
         <form className="flex flex-col" onSubmit={handleSubmit}>
           <label htmlFor="titre">Titre</label>
           <input id="titre" name="titre" type="text" value={formData.titre} onInput={handleChange} />

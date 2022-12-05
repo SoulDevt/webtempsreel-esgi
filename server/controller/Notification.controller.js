@@ -1,6 +1,6 @@
 const event = { type: "notification", data: { titre: "", message: "" } };
 const connection = new Set();
-const { sendEvent } = require("../sse");
+const { sendEvent, convertMessage } = require("../sse");
 
 const getNotification = (req, res, next) => {
   res.writeHead(200, {
@@ -10,7 +10,12 @@ const getNotification = (req, res, next) => {
   });
 
   connection.add(res);
-  res.write(": \n\n");
+  res.write(
+    convertMessage({
+      type: "nb-connexion",
+      nbConnexion: connection.size,
+    })
+  );
   const interval = setInterval(() => {
     res.write(": \n\n");
     res.flush();
