@@ -10,7 +10,9 @@ const app = express();
 app.use(compression());
 app.use(
   cors({
-    origin: "http://localhost:8000",
+    origin: `http://${process.env.HOST || "localhost"}:${
+      process.env.PORT_CLIENT || 8000
+      }`,
     credentials: true
   })
 );
