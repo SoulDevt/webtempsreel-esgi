@@ -10,16 +10,16 @@ const getNotification = (req, res, next) => {
   });
 
   connection.add(res);
-  res.write(
-    convertMessage({
-      type: "nb-connexion",
-      nbConnexion: connection.size,
-    })
-  );
+  res.write(": \n\n");
   const interval = setInterval(() => {
-    res.write(": \n\n");
+    res.write(
+      convertMessage({
+        type: "nb-connexion",
+        nbConnexion: connection.size,
+      })
+    );
     res.flush();
-  }, 10000);
+  }, 5000);
 
   res.on("close", () => {
     console.log("sse connection closed");

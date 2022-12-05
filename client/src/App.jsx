@@ -15,7 +15,7 @@ const Notification = lazy(() => import('./pages/Notification'));
 const App = () => {
   const socket = useMemo(() => io(serverUrl), []);
   const [listenning, setListenning] = useState(false);
-  const [nbConnexion, setNbConnexion] = useState(1)
+  const [nbConnexion, setNbConnexion] = useState(null);
 
   useEffect(() => {
     const source = new EventSource(`${serverUrl}/stream`, { withCredentials: true });
@@ -39,9 +39,7 @@ const App = () => {
 
       source.addEventListener('nb-connexion', (e) => {
         const data = JSON.parse(e.data);
-        if(data.nbConnexion && data.nbConnexion !== nbConnexion)
-          setNbConnexion(data.nbConnexion)
-   
+        if (data.nbConnexion && data.nbConnexion !== nbConnexion) setNbConnexion(data.nbConnexion);
       });
 
       source.addEventListener('error', (error) => {
@@ -52,7 +50,6 @@ const App = () => {
       source.addEventListener('close', () => {
         console.log('SSE closed!');
       });
-
     }
 
     setListenning(true);
