@@ -1,4 +1,4 @@
-import axios from 'axios'
+// import axios from 'axios'
 import React, { useContext, useState } from 'react'
 import {Link, useNavigate } from 'react-router-dom'
 // import { AuthContext } from '../context/authContext'
@@ -22,7 +22,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await login(inputs)
+      // await login(inputs)
       navigate("/")
     }
     catch(err) {
