@@ -1,27 +1,30 @@
 require("dotenv").config();
 const express = require("express");
+const compression = require("compression");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
-// const EventEmitter = require("events");
 const mainRouter = require("./routes");
 
-// const notificationEvent = new EventEmitter();
 const app = express();
-app.use(cors());
+app.use(compression());
+app.use(
+  cors({
+    origin: `http://${process.env.HOST || "localhost"}:${
+      process.env.PORT_CLIENT || 8000
+      }`,
+    credentials: true
+  })
+);
+
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
 app.use(mainRouter);
-
-// app.use(express.static("./notification.js"));
-
-// app.get("/api/notification", (request, response) => {
-//   response.setHeader("Content-Type", "text/event-stream");
-//   response.setHeader("Connection", "keep-alive");
-//   response.setHeader("Cache-Control", "no-cache");
-
-//   notificationEvent.on("update", (users) => {
-//     response.write(`event: update\ndata: ${JSON.stringify(users)}\n\n`);
-//   });
-// });
 const server = http.createServer(app);
 
 const io = new Server(server, {

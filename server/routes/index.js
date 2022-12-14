@@ -1,8 +1,7 @@
-const router = require( "express" ).Router();
+const router = require("express").Router();
 
-router.use('/security', require('./security'));
-router.get("/", (req, res) => {
-  res.send("Hello world");
-});
+router.use("/security", require("./security"));
+router.use("/stream", require("./sseRoute"));
+router.use("/notification", require("./notification"));
 
 module.exports = router;
