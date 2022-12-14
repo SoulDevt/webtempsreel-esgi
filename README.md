@@ -2,7 +2,6 @@
 ```bash
 docker-compose build --pull --no-cache
 docker-compose up -d
-
 ```
 
 ## Installation
@@ -23,6 +22,11 @@ docker-compose exec node npm run dev:client
 server:
 ```bash
 docker-compose exec node npm run dev:server
+```
+
+## End
+```bash
+docker-compose down --remove-orphans --volumes --timeout 0
 ```
 
 ## Migration BDD
