@@ -12,6 +12,7 @@ import { requireAuth } from './middlewares';
 const Home = lazy(() => import('./pages/Home'));
 const Error = lazy(() => import('./pages/Error'));
 const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
 const Notification = lazy(() => import('./pages/Notification'));
 // pages - admin
 const ListeSalon = lazy(() => import('./pages/admin/ListeSalon'));
@@ -79,8 +80,8 @@ const App = () => {
         </Route>
         <Route path="/notification" element={<Notification nbConnexion={nbConnexion} />} />
         <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="*" element={<Error />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </Suspense>
   );
