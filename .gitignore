@@ -29,5 +29,5 @@ dist-ssr
 .node_repl_history
 
 #db
-db
+db-data
 .env
