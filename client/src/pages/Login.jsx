@@ -1,47 +1,70 @@
 // import axios from 'axios'
-import React, { useContext, useState } from 'react'
-import {Link, useNavigate } from 'react-router-dom'
-// import { AuthContext } from '../context/authContext'
+import { useState, useEffect, useCallback, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthService } from '../services';
+import { AppContext, getFromToken } from '../contexts/app-context';
+import { toast } from 'react-toastify';
 
-function Login() {
-  const [inputs,setInputs] = useState({
-    username: '',
-    password: '',
-  })
+const Login = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [err, setError] = useState(null);
+  const navigate = useNavigate();
+  const { accessToken, setAccessToken } = useContext(AppContext);
 
-  const [err,setError] = useState(null)
+  useEffect(() => {
+    if (accessToken) navigate('/')
+  }, []);
 
-//   const {login} = useContext(AuthContext)
+  const handleChange = useCallback(
+    (event) => {
+      const name = event.target.name;
+      const value = name === 'isAdmin' ? event.target.checked : event.target.value;
+      setFormData({ ...formData, [name]: value });
+      setError(null);
+    },
+    [formData]
+  );
 
-  const navigate = useNavigate()
-
-  const handleChange = (e) => {
-    setInputs(prev => ({ ...prev, [e.target.name]: e.target.value}))
-  }
-  
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    setFormData({
+      email: formData.email.trim(),
+      password: formData.password.trim()
+    });
     try {
-      // await login(inputs)
-      navigate("/")
+      const res = await AuthService.login(formData);
+      setAccessToken(getFromToken(res));
+      setFormData({ email: '', password: '' });
+      toast.success('You have been logged in successfully !');
+      navigate('/');
+    } catch (err) {
+      console.log(err);
+      // setError(err.response.data);
     }
-    catch(err) {
-      setError(err.response.data)
-    }
-  }
+  };
   return (
     <div className="auth">
       <h1>Login</h1>
       <form action="">
-        <input type="text" placeholder='username'  onChange={handleChange} name="username" />
-        <input type="password" placeholder='password' onChange={handleChange} name="password" />
+        <input type="text" placeholder="email" value={formData.email} onChange={handleChange} name="email" />
+        <input
+          type="password"
+          placeholder="password"
+          value={formData.password}
+          onChange={handleChange}
+          name="password"
+        />
         <button onClick={handleSubmit}>Login</button>
         {err && <p>{err}</p>}
-        <span>Don't you have an account ? <Link to='/register'>Register</Link></span>
+        <span>
+          Don't you have an account ? <Link to="/register">Register</Link>
+        </span>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Login
-
+export default Login;
