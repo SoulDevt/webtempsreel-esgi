@@ -1,12 +1,12 @@
-import { useEffect, useState, useMemo, lazy, Suspense } from 'react';
+import { useState, useMemo, lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Nav } from './components';
+import { Nav, RequireAuth } from './components';
 import { io } from 'socket.io-client';
 import { serverUrl } from './enums';
 import { Loader, Toast } from './components';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { requireAuth } from './middlewares';
+import { AppContextProvider } from './contexts/app-context';
 
 // pages
 const Home = lazy(() => import('./pages/Home'));
@@ -20,9 +20,9 @@ const Salon = lazy(() => import('./pages/admin/Salon'));
 const HomeAdmin = lazy(() => import('./pages/admin/Home'));
 
 const App = () => {
-  const socket = useMemo(() => io(serverUrl), []);
   const [listenning, setListenning] = useState(false);
   const [nbConnexion, setNbConnexion] = useState(null);
+  const socket = useMemo(() => io(serverUrl), []);
 
   useEffect(() => {
     const source = new EventSource(`${serverUrl}/stream`, { withCredentials: true });
@@ -69,20 +69,52 @@ const App = () => {
 
   return (
     <Suspense fallback={<Loader />}>
-      <Nav />
-      <ToastContainer />
-      <Routes>
-        <Route exact path="/" element={<Home />} />
-        <Route path="admin" onEnter={requireAuth}>
-          <Route index element={<HomeAdmin />} />
-          <Route path="liste-salon" element={<ListeSalon />} />
-          <Route path="salon/:id" element={<Salon />} />
-        </Route>
-        <Route path="/notification" element={<Notification nbConnexion={nbConnexion} />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="*" element={<Error />} />
-      </Routes>
+      <AppContextProvider>
+        <Nav />
+        <ToastContainer />
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+
+          <Route path="admin">
+            <Route
+              index
+              element={
+                <RequireAuth>
+                  <HomeAdmin />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="liste-salon"
+              element={
+                <RequireAuth>
+                  <ListeSalon />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="salon/:id"
+              element={
+                <RequireAuth>
+                  <Salon />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="notification"
+              element={
+                <RequireAuth>
+                  <Notification nbConnexion={nbConnexion} />
+                </RequireAuth>
+              }
+            />
+          </Route>
+
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<Error />} />
+        </Routes>
+      </AppContextProvider>
     </Suspense>
   );
 };
