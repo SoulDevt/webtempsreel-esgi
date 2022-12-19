@@ -13,11 +13,13 @@ const Home = lazy(() => import('./pages/Home'));
 const Error = lazy(() => import('./pages/Error'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
-const Notification = lazy(() => import('./pages/Notification'));
+const ChatBot = lazy(() => import('./pages/ChatBot'));
+
 // pages - admin
 const ListeSalon = lazy(() => import('./pages/admin/ListeSalon'));
 const Salon = lazy(() => import('./pages/admin/Salon'));
 const HomeAdmin = lazy(() => import('./pages/admin/Home'));
+const Notification = lazy(() => import('./pages/Notification'));
 
 const App = () => {
   const [listenning, setListenning] = useState(false);
@@ -112,6 +114,7 @@ const App = () => {
 
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/chatbot" element={<ChatBot />} />
           <Route path="*" element={<Error />} />
         </Routes>
       </AppContextProvider>
