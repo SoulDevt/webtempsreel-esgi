@@ -5,3 +5,5 @@ export const writingMessageBot = ({ message }) => {
   }, 2000);
   return showMessage;
 };
+
+export const endMessage = ["J'espère vous êtes satisfait de votre demande.", 'Bonne journée !'];

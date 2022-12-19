@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import chatBotImg from '../assets/chatbot.png';
 import style from '../styles/chatbot.module.css';
 import { Step1 } from '../components';
-import { writingMessageBot } from '../helpers';
+import { endMessage } from '../helpers';
 
 const Chatbot = () => {
   const [step1, setStep1] = useState(true);
@@ -18,14 +18,25 @@ const Chatbot = () => {
       type: 'bot'
     }
   ]);
-  const showMessagesBot = ({ id, message, type }) => {
-    if (type !== 'bot') return message;
-  };
 
-  const handleStep1 = (val) => {
+  const handleStep1 = useCallback((val) => {
+    if(val === 4) endStep();
+  
     setStep1(false);
     console.log(val, 'step1');
-  };
+  }, [step1]);
+  
+  const endStep = useCallback(() => {
+    endMessage.map((elem) => {
+      console.log(messages)
+      messages.push({
+        id: messages[messages.length-1].id+1,
+        message: elem,
+        type: 'bot'
+      })
+    })
+    setMessages(messages);
+  }, [])
 
   return (
     <div className="Chatbot container mx-auto px-4 flex flex-col justify-center items-center">
