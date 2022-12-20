@@ -1,2 +1,2 @@
 export * from './url';
-export * from './message';
+export * from './chatbot';

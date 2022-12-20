@@ -5,6 +5,11 @@ docker-compose up -d
 ```
 
 ## Installation
+Pour chaque .env.example :
+```bash
+cp .env.example .env
+```
+
 client :
 ```bash
 docker-compose exec node npm run install:client
