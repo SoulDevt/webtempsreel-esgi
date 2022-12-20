@@ -1,3 +1,3 @@
-import Step1 from "./Step1";
+import SelectOption from "./SelectOption";
 
-export { Step1 };
+export { SelectOption };
