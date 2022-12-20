@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import chatBotImg from '../assets/chatbot.png';
 import style from '../styles/chatbot.module.css';
 import { SelectOption } from '../components';
-import { endMessage, option1, option3, botMessage3 } from '../enums';
+import { endMessages, option1, option3, botMessage3 } from '../enums';
 import { delay } from '../helpers';
 
 const Chatbot = () => {
@@ -21,15 +21,17 @@ const Chatbot = () => {
     }
   ]);
 
-  const handleChoice1 = ({ id, name }) => {
-    console.log(id, name);
+  const handleChoice1 = async ({ id, option }) => {
+    const minDelay = 2000;
     setChoice1(false);
-    sendMessage(name, 'human');
+    await sendMessage(option, 'human');
     if (id === 4) {
-      sendMessage(endMessage);
+      for (let elem in endMessages) {
+        await sendMessage(endMessages[elem]);
+      }
     }
     if (id === 3) {
-      sendMessage(botMessage3);
+      await sendMessage(botMessage3);
       setChoice3(true);
     }
   };
@@ -39,30 +41,26 @@ const Chatbot = () => {
   }, []);
 
   const sendMessage = useCallback(
-    async (messageOrList, type = 'bot') => {
-      let list = messageOrList;
+    async (message, type = 'bot') => {
       if (type !== 'bot' && type !== 'human') return;
-      if (typeof messageOrList === 'string') list = [messageOrList];
 
-      list.map(async (elem) => {
-        const newMessage = {
-          id: messages[messages.length - 1].id + 1,
-          message: elem,
-          type: type
-        };
+      const newMessage = {
+        id: messages[messages.length - 1].id + 1,
+        message: message,
+        type: type
+      };
 
-        if (type === 'bot') {
-          newMessage.message = 'Typing...';
-          setMessages([...messages, newMessage]);
-          console.log(messages.length);
-          await delay(2000);
-          newMessage.message = elem;
-          messages.push(newMessage);
-        } else {
-          messages.push(newMessage);
-        }
-        setMessages(messages);
-      });
+      if (type === 'bot') {
+        newMessage.message = 'Typing...';
+        setMessages([...messages, newMessage]);
+        await delay(1500);
+        newMessage.message = message;
+        messages.push(newMessage);
+      } else {
+        messages.push(newMessage);
+      }
+      setMessages(messages);
+      return;
     },
     [messages]
   );

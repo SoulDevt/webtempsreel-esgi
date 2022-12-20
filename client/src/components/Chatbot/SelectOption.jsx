@@ -8,7 +8,7 @@ const SelectOption = ({ options, chosenOption }) => {
             className="mr-2 mb-2 'dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-300'"
             key={option.id}
             onClick={() => chosenOption(option)}>
-            {option.name}
+            {option.option}
           </button>
         ))}
       </div>
