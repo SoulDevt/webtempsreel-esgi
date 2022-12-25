@@ -1,6 +1,6 @@
 export const isTokenExpired = (tokenSeconds) => {
-  const currentTime = Date.now() / 1000;
-  return tokenSeconds < currentTime;
+  const currentTime = new Date();
+  return tokenSeconds < currentTime.getMilliseconds();
 };
 
 export async function delay(delayInms) {

@@ -34,7 +34,7 @@ class AuthService {
       if (res.status == 500) {
         throw new Error('An error occurred, please try again later');
       } else {
-        throw new Error('Invalid account');
+        throw new Error('Invalid account or password');
       }
     }
     const response = await res.json();

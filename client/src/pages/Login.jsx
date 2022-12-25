@@ -41,7 +41,7 @@ const Login = () => {
       toast.success('You have been logged in successfully !');
       navigate('/');
     } catch (err) {
-      console.log(err);
+      toast.error(err.toString());
       // setError(err.response.data);
     }
   };
