@@ -3,7 +3,6 @@
     width: 100%;
     max-width: 800px;
     height: 100%;
-    max-height: 800px;
     padding: 30px 30px;
     background: #fdfdfe;
     border-radius: 20px;
@@ -20,7 +19,7 @@
 
 .main {
     margin: 30px 0 0;
-    max-height: 410px;
+    max-height: 60vh;
     overflow-y: auto;
 }
 
@@ -68,6 +67,8 @@
 
 .bottom {
     margin: 120px 0 0;
+    z-index: 10;
+    position: relative;
 }
 
 .wrapper .content .bottom .btm {

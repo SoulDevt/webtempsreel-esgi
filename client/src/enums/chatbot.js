@@ -13,7 +13,7 @@ export const initMessages = [
   }
 ];
 
-export const option1 = [
+export const initOption = [
   {
     id: 1,
     option: 'Entretien de son véhicule'
@@ -32,6 +32,29 @@ export const option1 = [
   }
 ];
 
+export const botMessage2 = ["Quelle est votre type d'usage ?"];
+
+export const option2 = [
+  {
+    id: 1,
+    option: 'Routier'
+  },
+  {
+    id: 2,
+    option: 'Tout terrain'
+  },
+  {
+    id: 3,
+    option: 'Sportif'
+  },
+  {
+    id: 4,
+    option: 'Retour'
+  }
+];
+
+export const botMessage3 = ['Vous souhaitez être contacté par email ou par téléphone ?'];
+
 export const option3 = [
   {
     id: 1,
@@ -47,7 +70,6 @@ export const option3 = [
   }
 ];
 
-export const botMessage3 = ['Vous souhaitez être contacté par email ou par téléphone ?'];
 export const endMessages = ["J'espère vous êtes satisfait de votre demande.", 'Bonne journée !'];
 export const emailMessage = `Voici notre email : ${email}`;
 export const telephoneMessage = `Voici notre telephone : ${telephone}`;

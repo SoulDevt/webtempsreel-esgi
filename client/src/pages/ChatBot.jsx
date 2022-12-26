@@ -1,36 +1,81 @@
-import { useState, useCallback } from 'react';
-import chatBotImg from '../assets/chatbot.png';
-import style from '../styles/chatbot.module.css';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import getDay from 'date-fns/getDay';
+import parse from 'date-fns/parse';
+import format from 'date-fns/format';
+import fr from 'date-fns/locale/fr';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import DatePicker from 'react-datepicker';
+
 import { SelectOption } from '../components';
-import { endMessages, option1, option3, botMessage3, emailMessage, telephoneMessage, initMessages } from '../enums';
+import {
+  endMessages,
+  initOption,
+  option2,
+  botMessage2,
+  option3,
+  botMessage3,
+  emailMessage,
+  telephoneMessage,
+  initMessages
+} from '../enums';
 import { delay } from '../helpers';
 
+import chatBotImg from '../assets/chatbot.png';
+import style from '../styles/chatbot.module.css';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-datepicker/dist/react-datepicker.css';
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: getDay,
+  getDay,
+  locales: { fr }
+});
+
+const today = new Date().toISOString();
+
 const Chatbot = () => {
-  const [choice1, setChoice1] = useState(true);
+  const [initChoice, setInitChoice] = useState(true);
+  const [choice2, setChoice2] = useState(false);
   const [choice3, setChoice3] = useState(false);
+  const [calendar, setCalendar] = useState(false);
+  const [events, setEvents] = useState([{ start: new Date(), end: new Date(), title: 'special event' }]);
+  const [choosenDate, setChoosenDate] = useState(null);
   const [messages, setMessages] = useState(initMessages);
+  const messagesEndRef = useRef();
 
   const handleChoice1 = useCallback(async ({ id, option }) => {
-    setChoice1(false);
+    setInitChoice(false);
     await sendMessage(option, 'human');
-    if (id === 4) {
-      for (let elem in endMessages) {
-        await sendMessage(endMessages[elem]);
-      }
+    if (id === 2) {
+      await sendMessage(botMessage2);
+      setChoice2(true);
     } else if (id === 3) {
       await sendMessage(botMessage3);
       setChoice3(true);
+    } else if (id === 4) {
+      for (let elem in endMessages) {
+        await sendMessage(endMessages[elem]);
+      }
     }
+  }, []);
+
+  const handleChoice2 = useCallback(async ({ id, option }) => {
+    setChoice2(false);
+    await sendMessage(option, 'human');
+    if (id === 1) setCalendar(true);
+    else if (id === 2) setCalendar(true);
+    else if (id === 3) setCalendar(true);
+    else if (id === 4) return setInitChoice(true);
   }, []);
 
   const handleChoice3 = useCallback(async ({ id, option }) => {
     setChoice3(false);
     await sendMessage(option, 'human');
     if (id === 1) await sendMessage(emailMessage);
-    
     else if (id === 2) await sendMessage(telephoneMessage);
-    
-    else if (id === 3) return setChoice1(true);
+    else if (id === 3) return setInitChoice(true);
     for (let elem in endMessages) {
       await sendMessage(endMessages[elem]);
     }
@@ -59,21 +104,52 @@ const Chatbot = () => {
     },
     [messages]
   );
-  // const endStep = useCallback(() => {
-  //   endMessage.map((elem) => {
-  //     messages.push({
-  //       id: messages[messages.length - 1].id + 1,
-  //       message: elem,
-  //       type: 'bot'
-  //     });
-  //   });
-  //   setMessages(messages);
-  // }, []);
 
-  const showComponent = useCallback(() => {
-    if (choice1) return <SelectOption options={option1} chosenOption={handleChoice1} />;
+  const showUserComponent = useCallback(() => {
+    if (initChoice) return <SelectOption options={initOption} chosenOption={handleChoice1} />;
+    if (choice2) return <SelectOption options={option2} chosenOption={handleChoice2} />;
     if (choice3) return <SelectOption options={option3} chosenOption={handleChoice3} />;
-  }, [choice1, choice3]);
+    if (calendar)
+      return (
+        <>
+          <input type="text" placeholder="Nom" className="border border-slate-800 rounded-md p-2 mr-3" />
+          {/* TODO: fix date picker */}
+          <DatePicker
+            selected={choosenDate}
+            onChange={(date) => setChoosenDate(date)}
+            value={choosenDate}
+            minDate={new Date()}
+            dateFormat="dd/MM/yyyy"
+            className="border border-slate-800 rounded-md p-2 z-10 relative"
+            showTimeSelect
+            timeFormat="HH:mm"
+            timeIntervals={60}
+            minTime={new Date(today)}
+            maxTime={new Date(today)}
+            timeCaption="Heure"
+            placeholderText="Choisissez une date"
+          />
+          <button>Valider</button>
+        </>
+      );
+  }, [initChoice, choice2, choice3, calendar, choosenDate]);
+
+  const showCalendar = useCallback(() => {
+    return (
+      <Calendar localizer={localizer} events={events} className="text-slate-800 mt-4" style={{ height: '500px' }} />
+    );
+  }, [events, calendar]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollTo({
+      top: messagesEndRef.current.offsetHeight,
+      behavior: 'smooth'
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <div className="Chatbot container mx-auto px-4 flex flex-col justify-center items-center">
@@ -85,7 +161,7 @@ const Chatbot = () => {
             <img className={style.img} src={chatBotImg} alt="chatbot image" />
             <h2 className="text-slate-800 font-semibold ml-2">Le bot</h2>
           </div>
-          <div className={`${style.main} snap-y scrollbar`}>
+          <div ref={messagesEndRef} className={`${style.main} snap-y scrollbar`}>
             <div className={style.messages}>
               {messages.length &&
                 messages.map((message) => (
@@ -94,9 +170,11 @@ const Chatbot = () => {
                   </div>
                 ))}
             </div>
+            {calendar && showCalendar()}
           </div>
+
           <div className={style.bottom}>
-            <div className="flex items-center">{showComponent()}</div>
+            <div className="flex items-center">{showUserComponent()}</div>
           </div>
         </div>
       </div>
