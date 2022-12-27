@@ -5,6 +5,7 @@ import format from 'date-fns/format';
 import fr from 'date-fns/locale/fr';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
+import { toast } from 'react-toastify';
 
 import { SelectOption } from '../components';
 import {
@@ -18,7 +19,7 @@ import {
   telephoneMessage,
   initMessages
 } from '../enums';
-import { delay } from '../helpers';
+import { delay, checkReservationsValid, checkReservationsNotExist } from '../helpers';
 
 import chatBotImg from '../assets/chatbot.png';
 import style from '../styles/chatbot.module.css';
@@ -40,8 +41,10 @@ const Chatbot = () => {
   const [choice2, setChoice2] = useState(false);
   const [choice3, setChoice3] = useState(false);
   const [calendar, setCalendar] = useState(false);
-  const [events, setEvents] = useState([{ start: new Date(), end: new Date(), title: 'special event' }]);
-  const [choosenDate, setChoosenDate] = useState(null);
+  const [events, setEvents] = useState([
+    { start: new Date(), end: new Date(), title: 'special event', type: 'routier' }
+  ]);
+  const [choosenEvent, setChoosenEvent] = useState({ title: '', date: '', type: '' });
   const [messages, setMessages] = useState(initMessages);
   const messagesEndRef = useRef();
 
@@ -64,10 +67,25 @@ const Chatbot = () => {
   const handleChoice2 = useCallback(async ({ id, option }) => {
     setChoice2(false);
     await sendMessage(option, 'human');
-    if (id === 1) setCalendar(true);
-    else if (id === 2) setCalendar(true);
-    else if (id === 3) setCalendar(true);
-    else if (id === 4) return setInitChoice(true);
+    if (id === 1) {
+      setCalendar(true);
+      setChoosenEvent({
+        ...choosenEvent,
+        type: 'routier'
+      });
+    } else if (id === 2) {
+      setCalendar(true);
+      setChoosenEvent({
+        ...choosenEvent,
+        type: 'tout-terrain'
+      });
+    } else if (id === 3) {
+      setCalendar(true);
+      setChoosenEvent({
+        ...choosenEvent,
+        type: 'sportif'
+      });
+    } else if (id === 4) return setInitChoice(true);
   }, []);
 
   const handleChoice3 = useCallback(async ({ id, option }) => {
@@ -105,34 +123,83 @@ const Chatbot = () => {
     [messages]
   );
 
+  const handleTitle = useCallback(
+    (event) => {
+      const name = event.target.name;
+      const value = event.target.value;
+      setChoosenEvent({ ...choosenEvent, [name]: value });
+    },
+    [choosenEvent]
+  );
+
+  const handleDatePicker = useCallback(
+    (value) => {
+      setChoosenEvent({ ...choosenEvent, date: value });
+    },
+    [choosenEvent]
+  );
+
+  const handleSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
+      let res = checkReservationsValid(choosenEvent);
+      if (typeof res === 'string') {
+        setChoosenEvent({...choosenEvent, title: '', date: ''});
+        return toast.error(res);
+      }
+
+      const otherReservations = events.filter((event) => event.type === choosenEvent.type);
+      res = checkReservationsNotExist(res, otherReservations);
+      if (typeof res === 'string') {
+        setChoosenEvent({ title: '', date: '', type: '' });
+        return toast.error(res);
+      }
+
+      console.log(choosenEvent);
+      // setEvents([...events, choosenEvent]);
+      // setCalendar(false);
+      // setInitChoice(true);
+    },
+    [events, choosenEvent]
+  );
+
   const showUserComponent = useCallback(() => {
     if (initChoice) return <SelectOption options={initOption} chosenOption={handleChoice1} />;
     if (choice2) return <SelectOption options={option2} chosenOption={handleChoice2} />;
     if (choice3) return <SelectOption options={option3} chosenOption={handleChoice3} />;
     if (calendar)
       return (
-        <>
-          <input type="text" placeholder="Nom" className="border border-slate-800 rounded-md p-2 mr-3" />
-          {/* TODO: fix date picker */}
+        <form className="flex items-center w-full">
+          <input
+            type="text"
+            placeholder="Titre de la réservation"
+            className="border border-slate-800 rounded-md p-2 mr-3"
+            name="title"
+            value={choosenEvent.title}
+            onInput={handleTitle}
+          />
           <DatePicker
-            selected={choosenDate}
-            onChange={(date) => setChoosenDate(date)}
-            value={choosenDate}
+            name="date"
+            selected={choosenEvent.date}
+            onChange={handleDatePicker}
+            value={choosenEvent.date}
             minDate={new Date()}
             dateFormat="dd/MM/yyyy"
             className="border border-slate-800 rounded-md p-2 z-10 relative"
             showTimeSelect
             timeFormat="HH:mm"
             timeIntervals={60}
-            minTime={new Date(today)}
-            maxTime={new Date(today)}
+            minTime={new Date().setHours(9, 0, 0)}
+            maxTime={new Date().setHours(17, 0, 0)}
             timeCaption="Heure"
             placeholderText="Choisissez une date"
           />
-          <button>Valider</button>
-        </>
+          <button type="submit" className=" dark:text-gray-200 hover:text-gray-400 bg-slate-800" onClick={handleSubmit}>
+            Valider
+          </button>
+        </form>
       );
-  }, [initChoice, choice2, choice3, calendar, choosenDate]);
+  }, [initChoice, choice2, choice3, calendar, choosenEvent]);
 
   const showCalendar = useCallback(() => {
     return (
