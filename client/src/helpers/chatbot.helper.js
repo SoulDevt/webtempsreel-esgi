@@ -1,11 +1,14 @@
+import dayjs from 'dayjs';
+
 export const checkReservationsValid = (values) => {
   const { date, title, type } = values;
+
   if (!date || !title || !type) return 'Please fill in all fields';
-  if (date < new Date()) return 'Please select a valid date';
+  if (date < Date.now()) return 'Please select a valid date';
   if (date.getHours() < 9 || date.getHours() > 18) return 'Please select a valid hours';
   if (title.length < 3) return 'Title must be at least 3 characters';
 
-  const end = date + date.setHours(date.getHours() + 1);
+  const end = dayjs(date).add(1, 'h').toDate();
 
   return { title, start: date, end: end, type };
 };

@@ -144,7 +144,7 @@ const Chatbot = () => {
       event.preventDefault();
       let res = checkReservationsValid(choosenEvent);
       if (typeof res === 'string') {
-        setChoosenEvent({...choosenEvent, title: '', date: ''});
+        setChoosenEvent({ ...choosenEvent, title: '', date: '' });
         return toast.error(res);
       }
 
@@ -154,9 +154,8 @@ const Chatbot = () => {
         setChoosenEvent({ title: '', date: '', type: '' });
         return toast.error(res);
       }
-
-      console.log(choosenEvent);
-      // setEvents([...events, choosenEvent]);
+      // console.log(res);
+      setEvents([...events, res]);
       // setCalendar(false);
       // setInitChoice(true);
     },
