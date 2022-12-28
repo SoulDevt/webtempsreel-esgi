@@ -7,14 +7,13 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 
-import { SelectOption } from '../components';
+import { SelectOption, EntretienForm } from '../components';
 import {
   endMessages,
+  botQuestions,
   initOption,
   option2,
-  botMessage2,
   option3,
-  botMessage3,
   emailMessage,
   telephoneMessage,
   initMessages
@@ -34,28 +33,31 @@ const localizer = dateFnsLocalizer({
   locales: { fr }
 });
 
-const today = new Date().toISOString();
-
 const Chatbot = () => {
   const [initChoice, setInitChoice] = useState(true);
+  const [choice1, setChoice1] = useState(false);
   const [choice2, setChoice2] = useState(false);
   const [choice3, setChoice3] = useState(false);
   const [calendar, setCalendar] = useState(false);
   const [events, setEvents] = useState([
     { start: new Date(), end: new Date(), title: 'special event', type: 'routier' }
   ]);
+  const [eventsShow, setEventsShow] = useState([]);
   const [choosenEvent, setChoosenEvent] = useState({ title: '', date: '', type: '' });
   const [messages, setMessages] = useState(initMessages);
   const messagesEndRef = useRef();
 
-  const handleChoice1 = useCallback(async ({ id, option }) => {
+  const handleInitChoice = useCallback(async ({ id, option }) => {
     setInitChoice(false);
     await sendMessage(option, 'human');
-    if (id === 2) {
-      await sendMessage(botMessage2);
+    if (id === 1) {
+      await sendMessage(botQuestions[0]);
+      setChoice1(true);
+    } else if (id === 2) {
+      await sendMessage(botQuestions[1]);
       setChoice2(true);
     } else if (id === 3) {
-      await sendMessage(botMessage3);
+      await sendMessage(botQuestions[2]);
       setChoice3(true);
     } else if (id === 4) {
       for (let elem in endMessages) {
@@ -64,22 +66,41 @@ const Chatbot = () => {
     }
   }, []);
 
+  const needAEntretien = useCallback(async (value) => {
+    setChoice1(false);
+    console.log(value);
+    if (value === 'Retour') {
+      await sendMessage(value, 'human');
+      setInitChoice(true);
+      return;
+    } else if (value) {
+      setCalendar(true);
+      setChoosenEvent({
+        ...choosenEvent,
+        type: 'entretien'
+      });
+    }
+  }, []);
+
   const handleChoice2 = useCallback(async ({ id, option }) => {
     setChoice2(false);
     await sendMessage(option, 'human');
     if (id === 1) {
+      setEventsShow(events.filter((event) => event.type === 'routier'));
       setCalendar(true);
       setChoosenEvent({
         ...choosenEvent,
         type: 'routier'
       });
     } else if (id === 2) {
+      setEventsShow(events.filter((event) => event.type === 'tout-terrain'));
       setCalendar(true);
       setChoosenEvent({
         ...choosenEvent,
         type: 'tout-terrain'
       });
     } else if (id === 3) {
+      setEventsShow(events.filter((event) => event.type === 'sportif'));
       setCalendar(true);
       setChoosenEvent({
         ...choosenEvent,
@@ -140,7 +161,7 @@ const Chatbot = () => {
   );
 
   const handleSubmit = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
       let res = checkReservationsValid(choosenEvent);
       if (typeof res === 'string') {
@@ -154,19 +175,25 @@ const Chatbot = () => {
         setChoosenEvent({ title: '', date: '', type: '' });
         return toast.error(res);
       }
-      // console.log(res);
+      // TODO : ajouter la reservation dans la base de données
       setEvents([...events, res]);
-      // setCalendar(false);
-      // setInitChoice(true);
+      setCalendar(false);
+      setChoosenEvent({ title: '', date: '', type: '' });
+      await sendMessage('Votre réservation a bien été prise en compte');
+      await sendMessage('Retour au menu principal');
+      await sendMessage(initMessages[0].message);
+      await sendMessage(initMessages[1].message);
+      setInitChoice(true);
     },
     [events, choosenEvent]
   );
 
   const showUserComponent = useCallback(() => {
-    if (initChoice) return <SelectOption options={initOption} chosenOption={handleChoice1} />;
-    if (choice2) return <SelectOption options={option2} chosenOption={handleChoice2} />;
-    if (choice3) return <SelectOption options={option3} chosenOption={handleChoice3} />;
-    if (calendar)
+    if (initChoice) return <SelectOption options={initOption} chosenOption={handleInitChoice} />;
+    else if (choice1) return <EntretienForm submit={needAEntretien} />;
+    else if (choice2) return <SelectOption options={option2} chosenOption={handleChoice2} />;
+    else if (choice3) return <SelectOption options={option3} chosenOption={handleChoice3} />;
+    else if (calendar)
       return (
         <form className="flex items-center w-full">
           <input
@@ -198,13 +225,7 @@ const Chatbot = () => {
           </button>
         </form>
       );
-  }, [initChoice, choice2, choice3, calendar, choosenEvent]);
-
-  const showCalendar = useCallback(() => {
-    return (
-      <Calendar localizer={localizer} events={events} className="text-slate-800 mt-4" style={{ height: '500px' }} />
-    );
-  }, [events, calendar]);
+  }, [initChoice, choice1, choice2, choice3, calendar, choosenEvent]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollTo({
@@ -236,7 +257,14 @@ const Chatbot = () => {
                   </div>
                 ))}
             </div>
-            {calendar && showCalendar()}
+            {calendar && (
+              <Calendar
+                localizer={localizer}
+                events={eventsShow}
+                className="text-slate-800 mt-4"
+                style={{ height: '500px' }}
+              />
+            )}
           </div>
 
           <div className={style.bottom}>

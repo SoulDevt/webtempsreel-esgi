@@ -32,7 +32,11 @@ export const initOption = [
   }
 ];
 
-export const botMessage2 = ["Quelle est votre type d'usage ?"];
+export const botQuestions = [
+  "Veuillez renseigner l'année et la date de votre dernière entretien",
+  "Quelle est votre type d'usage ?",
+  'Vous souhaitez être contacté par email ou par téléphone ?'
+];
 
 export const option2 = [
   {
@@ -52,8 +56,6 @@ export const option2 = [
     option: 'Retour'
   }
 ];
-
-export const botMessage3 = ['Vous souhaitez être contacté par email ou par téléphone ?'];
 
 export const option3 = [
   {
