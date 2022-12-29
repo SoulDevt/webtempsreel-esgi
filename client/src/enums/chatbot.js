@@ -72,6 +72,17 @@ export const option3 = [
   }
 ];
 
+export const option4 = [
+  {
+    id: 1,
+    option: 'Oui'
+  },
+  {
+    id: 2,
+    option: 'Non'
+  }
+];
+
 export const endMessages = ["J'espère vous êtes satisfait de votre demande.", 'Bonne journée !'];
 export const emailMessage = `Voici notre email : ${email}`;
 export const telephoneMessage = `Voici notre telephone : ${telephone}`;

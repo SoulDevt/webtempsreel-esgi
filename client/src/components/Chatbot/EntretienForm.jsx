@@ -14,11 +14,11 @@ const EntretienForm = ({ submit }) => {
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
-          const res = isLastEntretienBeforeAYear(date);
-          if (typeof res === 'string') {
-            setDate('');
-            return toast.error(res);
-          }
+      const res = isLastEntretienBeforeAYear(date);
+      if (typeof res === 'string') {
+        setDate('');
+        return toast.error(res);
+      }
       submit(res);
     },
     [date]
@@ -39,7 +39,10 @@ const EntretienForm = ({ submit }) => {
         className="border border-slate-800 rounded-md p-2 z-10 relative"
         placeholderText="Choisissez une date"
       />
-      <button className=" dark:text-gray-200 hover:text-gray-400 bg-slate-800 mr-3" onClick={handleSubmit} type="submit">
+      <button
+        className=" dark:text-gray-200 hover:text-gray-400 bg-slate-800 mr-3"
+        onClick={handleSubmit}
+        type="submit">
         Valider
       </button>
       <button

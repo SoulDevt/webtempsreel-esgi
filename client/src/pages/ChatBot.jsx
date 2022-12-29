@@ -7,13 +7,14 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 
-import { SelectOption, EntretienForm } from '../components';
+import { SelectOption, EntretienForm, KilometerForm } from '../components';
 import {
   endMessages,
   botQuestions,
   initOption,
   option2,
   option3,
+  option4,
   emailMessage,
   telephoneMessage,
   initMessages
@@ -38,6 +39,8 @@ const Chatbot = () => {
   const [choice1, setChoice1] = useState(false);
   const [choice2, setChoice2] = useState(false);
   const [choice3, setChoice3] = useState(false);
+  const [kilometer, setKilometer] = useState(false);
+  const [wantEntretien, setWantEntretien] = useState(false);
   const [calendar, setCalendar] = useState(false);
   const [events, setEvents] = useState([
     { start: new Date(), end: new Date(), title: 'special event', type: 'routier' }
@@ -66,21 +69,49 @@ const Chatbot = () => {
     }
   }, []);
 
-  const needAEntretien = useCallback(async (value) => {
-    setChoice1(false);
-    console.log(value);
-    if (value === 'Retour') {
-      await sendMessage(value, 'human');
-      setInitChoice(true);
-      return;
-    } else if (value) {
-      setCalendar(true);
-      setChoosenEvent({
-        ...choosenEvent,
-        type: 'entretien'
-      });
-    }
-  }, []);
+  const needAEntretien = useCallback(
+    async (value) => {
+      setChoice1(false);
+      if (value === 'Retour') {
+        await sendMessage(value, 'human');
+        setInitChoice(true);
+        return;
+      } else if (value) {
+        await sendMessage("Vous avez besoin d'un entretien.");
+        await sendMessage('Voici nos disponibilité :');
+        setEventsShow(events.filter((event) => event.type === 'entretien'));
+        setCalendar(true);
+        setChoosenEvent({
+          ...choosenEvent,
+          type: 'entretien'
+        });
+      } else {
+        await sendMessage('Combien de kilomètres avez-vous parcouru ?');
+        setKilometer(true);
+      }
+    },
+    [calendar, choosenEvent, events, eventsShow]
+  );
+
+  const checkKilometer = useCallback(
+    async (value) => {
+      setKilometer(false);
+      if (value) {
+        await sendMessage("Vous avez besoin d'un entretien.");
+        await sendMessage('Voici nos disponibilité :');
+        setEventsShow(events.filter((event) => event.type === 'entretien'));
+        setCalendar(true);
+        setChoosenEvent({
+          ...choosenEvent,
+          type: 'entretien'
+        });
+      } else {
+        await sendMessage('Vous souhaitez un entretien de votre vehicule ?');
+        setWantEntretien(true);
+      }
+    },
+    [calendar, choosenEvent, events, eventsShow]
+  );
 
   const handleChoice2 = useCallback(async ({ id, option }) => {
     setChoice2(false);
@@ -170,9 +201,10 @@ const Chatbot = () => {
       }
 
       const otherReservations = events.filter((event) => event.type === choosenEvent.type);
+      console.log(otherReservations);
       res = checkReservationsNotExist(res, otherReservations);
       if (typeof res === 'string') {
-        setChoosenEvent({ title: '', date: '', type: '' });
+        setChoosenEvent({ ...choosenEvent, title: '', date: '' });
         return toast.error(res);
       }
       // TODO : ajouter la reservation dans la base de données
@@ -188,11 +220,31 @@ const Chatbot = () => {
     [events, choosenEvent]
   );
 
+  const handleChoice4 = useCallback(async ({ id, option }) => {
+    setWantEntretien(false);
+    await sendMessage(option, 'human');
+    if (id === 1) {
+      await sendMessage('Voici nos disponibilité :');
+      setEventsShow(events.filter((event) => event.type === 'entretien'));
+      setCalendar(true);
+      setChoosenEvent({
+        ...choosenEvent,
+        type: 'entretien'
+      });
+    } else if (id === 2) {
+      for (let elem in endMessages) {
+        await sendMessage(endMessages[elem]);
+      }
+    }
+  }, []);
+
   const showUserComponent = useCallback(() => {
     if (initChoice) return <SelectOption options={initOption} chosenOption={handleInitChoice} />;
     else if (choice1) return <EntretienForm submit={needAEntretien} />;
     else if (choice2) return <SelectOption options={option2} chosenOption={handleChoice2} />;
     else if (choice3) return <SelectOption options={option3} chosenOption={handleChoice3} />;
+    else if (wantEntretien) return <SelectOption options={option4} chosenOption={handleChoice4} />;
+    else if (kilometer) return <KilometerForm submit={checkKilometer} />;
     else if (calendar)
       return (
         <form className="flex items-center w-full">
@@ -225,7 +277,7 @@ const Chatbot = () => {
           </button>
         </form>
       );
-  }, [initChoice, choice1, choice2, choice3, calendar, choosenEvent]);
+  }, [initChoice, choice1, choice2, choice3, calendar, choosenEvent, kilometer, wantEntretien]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollTo({
@@ -234,8 +286,15 @@ const Chatbot = () => {
     });
   };
 
+  const showCalendar = useCallback(() => {
+    return (
+      <Calendar localizer={localizer} events={eventsShow} className="text-slate-800 mt-4" style={{ height: '500px' }} />
+    );
+  }, [eventsShow]);
+
   useEffect(() => {
     scrollToBottom();
+    console.log(events);
   }, [messages]);
 
   return (
@@ -257,14 +316,7 @@ const Chatbot = () => {
                   </div>
                 ))}
             </div>
-            {calendar && (
-              <Calendar
-                localizer={localizer}
-                events={eventsShow}
-                className="text-slate-800 mt-4"
-                style={{ height: '500px' }}
-              />
-            )}
+            {calendar && showCalendar()}
           </div>
 
           <div className={style.bottom}>
