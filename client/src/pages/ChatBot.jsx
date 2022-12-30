@@ -41,9 +41,7 @@ const Chatbot = () => {
   const [kilometer, setKilometer] = useState(false);
   const [wantEntretien, setWantEntretien] = useState(false);
   const [calendar, setCalendar] = useState(false);
-  const [events, setEvents] = useState([
-    { start: new Date(), end: new Date(), title: 'special event', type: 'routier' }
-  ]);
+  const [events, setEvents] = useState([]);
   const [eventsShow, setEventsShow] = useState([]);
   const [choosenEvent, setChoosenEvent] = useState({ title: '', date: '', type: '' });
   const [messages, setMessages] = useState(initMessages);
