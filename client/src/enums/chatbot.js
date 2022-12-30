@@ -84,5 +84,6 @@ export const option4 = [
 ];
 
 export const endMessages = ["J'espère vous êtes satisfait de votre demande.", 'Bonne journée !'];
+export const resetWorkflow = ['Votre réservation a bien été prise en compte', 'Réinitialisation du workflow']
 export const emailMessage = `Voici notre email : ${email}`;
 export const telephoneMessage = `Voici notre telephone : ${telephone}`;

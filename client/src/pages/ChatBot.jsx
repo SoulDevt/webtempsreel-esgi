@@ -4,10 +4,9 @@ import parse from 'date-fns/parse';
 import format from 'date-fns/format';
 import fr from 'date-fns/locale/fr';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 
-import { SelectOption, EntretienForm, KilometerForm } from '../components';
+import { SelectOption, EntretienForm, KilometerForm, DatePickerForm } from '../components';
 import {
   endMessages,
   botQuestions,
@@ -17,14 +16,14 @@ import {
   option4,
   emailMessage,
   telephoneMessage,
-  initMessages
+  initMessages,
+  resetWorkflow
 } from '../enums';
 import { delay, checkReservationsValid, checkReservationsNotExist } from '../helpers';
 
 import chatBotImg from '../assets/chatbot.png';
 import style from '../styles/chatbot.module.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import 'react-datepicker/dist/react-datepicker.css';
 
 const localizer = dateFnsLocalizer({
   format,
@@ -92,6 +91,17 @@ const Chatbot = () => {
     },
     [calendar, choosenEvent, events, eventsShow]
   );
+
+  const resetWorkFlow = useCallback(async (messages) => {
+    setCalendar(false);
+    for (const message of messages) {
+      await sendMessage(message);
+    }
+    setChoosenEvent({ title: '', date: '', type: '' });
+    await sendMessage(initMessages[0].message);
+    await sendMessage(initMessages[1].message);
+    setInitChoice(true);
+  }, []);
 
   const checkKilometer = useCallback(
     async (value) => {
@@ -209,13 +219,7 @@ const Chatbot = () => {
       }
       // TODO : ajouter la reservation dans la base de données
       setEvents([...events, res]);
-      setCalendar(false);
-      setChoosenEvent({ title: '', date: '', type: '' });
-      await sendMessage('Votre réservation a bien été prise en compte');
-      await sendMessage('Retour au menu principal');
-      await sendMessage(initMessages[0].message);
-      await sendMessage(initMessages[1].message);
-      setInitChoice(true);
+      await resetWorkFlow(resetWorkflow);
     },
     [events, choosenEvent]
   );
@@ -247,35 +251,12 @@ const Chatbot = () => {
     else if (kilometer) return <KilometerForm submit={checkKilometer} />;
     else if (calendar)
       return (
-        <form className="flex items-center w-full">
-          <input
-            type="text"
-            placeholder="Titre de la réservation"
-            className="border border-slate-800 rounded-md p-2 mr-3"
-            name="title"
-            value={choosenEvent.title}
-            onInput={handleTitle}
-          />
-          <DatePicker
-            name="date"
-            selected={choosenEvent.date}
-            onChange={handleDatePicker}
-            value={choosenEvent.date}
-            minDate={new Date()}
-            dateFormat="dd/MM/yyyy"
-            className="border border-slate-800 rounded-md p-2 z-10 relative"
-            showTimeSelect
-            timeFormat="HH:mm"
-            timeIntervals={60}
-            minTime={new Date().setHours(9, 0, 0)}
-            maxTime={new Date().setHours(17, 0, 0)}
-            timeCaption="Heure"
-            placeholderText="Choisissez une date"
-          />
-          <button type="submit" className=" dark:text-gray-200 hover:text-gray-400 bg-slate-800" onClick={handleSubmit}>
-            Valider
-          </button>
-        </form>
+        <DatePickerForm
+          choosenEvent={choosenEvent}
+          handleSubmit={handleSubmit}
+          handleDatePicker={handleDatePicker}
+          handleTitle={handleTitle}
+        />
       );
   }, [initChoice, choice1, choice2, choice3, calendar, choosenEvent, kilometer, wantEntretien]);
 
@@ -294,7 +275,6 @@ const Chatbot = () => {
 
   useEffect(() => {
     scrollToBottom();
-    console.log(events);
   }, [messages]);
 
   return (
