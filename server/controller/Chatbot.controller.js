@@ -1,14 +1,13 @@
 const { ChabotEvent } = require("../models");
 
-const getEvents = (req, res, next) => {
-  ChabotEvent.findAll()
-    .then((events) => {
-      res.status(200).json(events);
-    })
-    .catch((error) => {
-      res.sendStatus(500);
-      console.error(error);
-    });
+const getEvents = async (req, res, next) => {
+  try {
+    const response = await ChabotEvent.findAll();
+    res.status(200).json(response);
+  } catch (error) {
+    res.sendStatus(500);
+    console.error(error);
+  }
 };
 
 const postEvent = async (req, res, next) => {
@@ -18,7 +17,7 @@ const postEvent = async (req, res, next) => {
     if (
       data.type === "entretien" ||
       data.type === "routier" ||
-      data.type === "toutTerrain" ||
+      data.type === "tout-terrain" ||
       data.type === "sportif"
     ) {
       const event = await ChabotEvent.create({
@@ -27,6 +26,7 @@ const postEvent = async (req, res, next) => {
         start: data.start,
         end: data.end,
       });
+      return res.sendStatus(201);
     } else {
       return res.status(401).json({ message: "Type d'évènement non reconnu" });
     }

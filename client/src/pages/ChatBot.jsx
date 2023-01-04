@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import getDay from 'date-fns/getDay';
 import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
 import format from 'date-fns/format';
 import fr from 'date-fns/locale/fr';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
@@ -24,13 +25,17 @@ import { delay, checkReservationsValid, checkReservationsNotExist } from '../hel
 import chatBotImg from '../assets/chatbot.png';
 import style from '../styles/chatbot.module.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { ChatbotService } from '../services';
 
+const locales = {
+  fr: fr
+};
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek: getDay,
+  startOfWeek,
   getDay,
-  locales: { fr }
+  locales
 });
 
 const Chatbot = () => {
@@ -76,7 +81,8 @@ const Chatbot = () => {
       } else if (value) {
         await sendMessage("Vous avez besoin d'un entretien.");
         await sendMessage('Voici nos disponibilité :');
-        setEventsShow(events.filter((event) => event.type === 'entretien'));
+        const filtered = events.filter((event) => event.type === 'entretien');
+        setEventsShow(filtered);
         setCalendar(true);
         setChoosenEvent({
           ...choosenEvent,
@@ -121,32 +127,35 @@ const Chatbot = () => {
     [calendar, choosenEvent, events, eventsShow]
   );
 
-  const handleChoice2 = useCallback(async ({ id, option }) => {
-    setChoice2(false);
-    await sendMessage(option, 'human');
-    if (id === 1) {
-      setEventsShow(events.filter((event) => event.type === 'routier'));
-      setCalendar(true);
-      setChoosenEvent({
-        ...choosenEvent,
-        type: 'routier'
-      });
-    } else if (id === 2) {
-      setEventsShow(events.filter((event) => event.type === 'tout-terrain'));
-      setCalendar(true);
-      setChoosenEvent({
-        ...choosenEvent,
-        type: 'tout-terrain'
-      });
-    } else if (id === 3) {
-      setEventsShow(events.filter((event) => event.type === 'sportif'));
-      setCalendar(true);
-      setChoosenEvent({
-        ...choosenEvent,
-        type: 'sportif'
-      });
-    } else if (id === 4) return setInitChoice(true);
-  }, []);
+  const handleChoice2 = useCallback(
+    async ({ id, option }) => {
+      setChoice2(false);
+      await sendMessage(option, 'human');
+      if (id === 1) {
+        setEventsShow(events.filter((event) => event.type === 'routier'));
+        setCalendar(true);
+        setChoosenEvent({
+          ...choosenEvent,
+          type: 'routier'
+        });
+      } else if (id === 2) {
+        setEventsShow(events.filter((event) => event.type === 'tout-terrain'));
+        setCalendar(true);
+        setChoosenEvent({
+          ...choosenEvent,
+          type: 'tout-terrain'
+        });
+      } else if (id === 3) {
+        setEventsShow(events.filter((event) => event.type === 'sportif'));
+        setCalendar(true);
+        setChoosenEvent({
+          ...choosenEvent,
+          type: 'sportif'
+        });
+      } else if (id === 4) return setInitChoice(true);
+    },
+    [events, eventsShow]
+  );
 
   const handleChoice3 = useCallback(async ({ id, option }) => {
     setChoice3(false);
@@ -202,43 +211,58 @@ const Chatbot = () => {
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
-      let res = checkReservationsValid(choosenEvent);
+      // check if the reservation is valid
+      const res = checkReservationsValid(choosenEvent);
       if (typeof res === 'string') {
         setChoosenEvent({ ...choosenEvent, title: '', date: '' });
         return toast.error(res);
       }
 
+      // check if the reservation is not already exist
       const otherReservations = events.filter((event) => event.type === choosenEvent.type);
-      console.log(otherReservations);
-      res = checkReservationsNotExist(res, otherReservations);
-      if (typeof res === 'string') {
+      const check = checkReservationsNotExist(res, otherReservations);
+      if (typeof check === 'string') {
         setChoosenEvent({ ...choosenEvent, title: '', date: '' });
-        return toast.error(res);
+        return toast.error(check);
       }
-      // TODO : ajouter la reservation dans la base de données
-      setEvents([...events, res]);
-      await resetWorkFlow(resetWorkflow);
+      // submit
+      try {
+        const submitted = await ChatbotService.postEvent(res);
+        if (submitted === 'success') {
+          setEvents([...events, res]);
+          await resetWorkFlow(resetWorkflow);
+        } else {
+          setChoosenEvent({ ...choosenEvent, title: '', date: '' });
+          return toast.error(submitted);
+        }
+      } catch (error) {
+        console.log(error);
+        return toast.error('Une erreur est survenue');
+      }
     },
     [events, choosenEvent]
   );
 
-  const handleChoice4 = useCallback(async ({ id, option }) => {
-    setWantEntretien(false);
-    await sendMessage(option, 'human');
-    if (id === 1) {
-      await sendMessage('Voici nos disponibilité :');
-      setEventsShow(events.filter((event) => event.type === 'entretien'));
-      setCalendar(true);
-      setChoosenEvent({
-        ...choosenEvent,
-        type: 'entretien'
-      });
-    } else if (id === 2) {
-      for (let elem in endMessages) {
-        await sendMessage(endMessages[elem]);
+  const handleChoice4 = useCallback(
+    async ({ id, option }) => {
+      setWantEntretien(false);
+      await sendMessage(option, 'human');
+      if (id === 1) {
+        await sendMessage('Voici nos disponibilité :');
+        setEventsShow(events.filter((event) => event.type === 'entretien'));
+        setCalendar(true);
+        setChoosenEvent({
+          ...choosenEvent,
+          type: 'entretien'
+        });
+      } else if (id === 2) {
+        for (let elem in endMessages) {
+          await sendMessage(endMessages[elem]);
+        }
       }
-    }
-  }, []);
+    },
+    [eventsShow]
+  );
 
   const showUserComponent = useCallback(() => {
     if (initChoice) return <SelectOption options={initOption} chosenOption={handleInitChoice} />;
@@ -265,11 +289,18 @@ const Chatbot = () => {
     });
   };
 
-  const showCalendar = useCallback(() => {
-    return (
-      <Calendar localizer={localizer} events={eventsShow} className="text-slate-800 mt-4" style={{ height: '500px' }} />
-    );
-  }, [eventsShow]);
+  const getData = useCallback(async () => {
+    const data = await ChatbotService.getEvents();
+    for (const iterator of data) {
+      iterator.start = new Date(iterator.start);
+      iterator.end = new Date(iterator.end);
+    }
+    setEvents(data);
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -294,7 +325,14 @@ const Chatbot = () => {
                   </div>
                 ))}
             </div>
-            {calendar && showCalendar()}
+            {calendar ? (
+              <Calendar
+                localizer={localizer}
+                events={eventsShow}
+                className="text-slate-800 mt-4"
+                style={{ height: '500px' }}
+              />
+            ) : null}
           </div>
 
           <div className={style.bottom}>

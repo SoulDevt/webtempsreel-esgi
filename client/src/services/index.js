@@ -1,3 +1,4 @@
 import AuthService from './auth.service';
+import ChatbotService from './chatbot.service';
 
-export { AuthService };
+export { AuthService, ChatbotService };

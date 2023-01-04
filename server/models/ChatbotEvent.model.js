@@ -10,7 +10,7 @@ ChatbotEvent.init(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        isIn: [["entretien", "routier", "toutTerrain", "sportif"]],
+        isIn: [["entretien", "routier", "tout-terrain", "sportif"]],
       },
     },
     title: {
