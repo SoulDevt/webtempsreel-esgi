@@ -17,7 +17,10 @@ export const checkReservationsNotExist = (event, events) => {
   if (events.length === 0) return event;
 
   const isEventExist = events.some((e) => {
-    return (e.start <= start && e.end > start) || (e.start < end && e.end >= end);
+    return (
+      (e.start.getTime() <= start.getTime() && e.end.getTime() > start.getTime()) ||
+      (e.start.getTime() < end.getTime() && e.end.getTime() >= end.getTime())
+    );
   });
 
   if (isEventExist) return 'Un rendez-vous existe déjà à cette date';
