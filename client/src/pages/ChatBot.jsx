@@ -18,7 +18,7 @@ import {
   emailMessage,
   telephoneMessage,
   initMessages,
-  resetWorkflow
+  resetWorkflowMessages
 } from '../enums';
 import { delay, checkReservationsValid, checkReservationsNotExist } from '../helpers';
 
@@ -52,24 +52,9 @@ const Chatbot = () => {
   const [messages, setMessages] = useState(initMessages);
   const messagesEndRef = useRef();
 
-  const handleInitChoice = useCallback(async ({ id, option }) => {
-    setInitChoice(false);
-    await sendMessage(option, 'human');
-    if (id === 1) {
-      await sendMessage(botQuestions[0]);
-      setChoice1(true);
-    } else if (id === 2) {
-      await sendMessage(botQuestions[1]);
-      setChoice2(true);
-    } else if (id === 3) {
-      await sendMessage(botQuestions[2]);
-      setChoice3(true);
-    } else if (id === 4) {
-      for (let elem in endMessages) {
-        await sendMessage(endMessages[elem]);
-      }
-    }
-  }, []);
+  /**
+   * Handle workflows
+   */
 
   const needAEntretien = useCallback(
     async (value) => {
@@ -96,16 +81,27 @@ const Chatbot = () => {
     [calendar, choosenEvent, events, eventsShow]
   );
 
-  const resetWorkFlow = useCallback(async (messages) => {
-    setCalendar(false);
-    for (const message of messages) {
-      await sendMessage(message);
-    }
-    setChoosenEvent({ title: '', date: '', type: '' });
-    await sendMessage(initMessages[0].message);
-    await sendMessage(initMessages[1].message);
-    setInitChoice(true);
-  }, []);
+  const handleInitChoice = useCallback(
+    async ({ id, option }) => {
+      setInitChoice(false);
+      await sendMessage(option, 'human');
+      if (id === 1) {
+        await sendMessage(botQuestions[0]);
+        setChoice1(true);
+      } else if (id === 2) {
+        await sendMessage(botQuestions[1]);
+        setChoice2(true);
+      } else if (id === 3) {
+        await sendMessage(botQuestions[2]);
+        setChoice3(true);
+      } else if (id === 4) {
+        for (let elem in endMessages) {
+          await sendMessage(endMessages[elem]);
+        }
+      }
+    },
+    [botQuestions, endMessages]
+  );
 
   const checkKilometer = useCallback(
     async (value) => {
@@ -152,22 +148,82 @@ const Chatbot = () => {
           ...choosenEvent,
           type: 'sportif'
         });
-      } else if (id === 4) return setInitChoice(true);
+      } else if (id === 4) await resetWorkFlow();
     },
-    [events, eventsShow]
+    [events, eventsShow, choosenEvent]
   );
 
-  const handleChoice3 = useCallback(async ({ id, option }) => {
-    setChoice3(false);
-    await sendMessage(option, 'human');
-    if (id === 1) await sendMessage(emailMessage);
-    else if (id === 2) await sendMessage(telephoneMessage);
-    else if (id === 3) return setInitChoice(true);
-    for (let elem in endMessages) {
-      await sendMessage(endMessages[elem]);
-    }
+  const handleChoice3 = useCallback(
+    async ({ id, option }) => {
+      setChoice3(false);
+      await sendMessage(option, 'human');
+      if (id === 1) await sendMessage(emailMessage);
+      else if (id === 2) await sendMessage(telephoneMessage);
+      else if (id === 3) return setInitChoice(true);
+      for (let elem in endMessages) {
+        await sendMessage(endMessages[elem]);
+      }
+    },
+    [emailMessage, telephoneMessage, endMessages]
+  );
+
+  const handleChoice4 = useCallback(
+    async ({ id, option }) => {
+      setWantEntretien(false);
+      await sendMessage(option, 'human');
+      if (id === 1) {
+        await sendMessage('Voici nos disponibilité :');
+        setEventsShow(events.filter((event) => event.type === 'entretien'));
+        setCalendar(true);
+        setChoosenEvent({
+          ...choosenEvent,
+          type: 'entretien'
+        });
+      } else if (id === 2) {
+        for (let elem in endMessages) {
+          await sendMessage(endMessages[elem]);
+        }
+      }
+    },
+    [events, eventsShow, choosenEvent]
+  );
+
+  /**
+   * resetting the workflow
+   */
+  const resetWorkFlow = useCallback(
+    async (messages = null, beginWorkflow = false) => {
+      setChoice1(false);
+      setChoice2(false);
+      setChoice3(false);
+      setKilometer(false);
+      setWantEntretien(false);
+      setCalendar(false);
+      setEventsShow([]);
+      setChoosenEvent({ title: '', date: '', type: '' });
+      if (messages && messages.length > 0) {
+        for (const { message, type } of messages) {
+          if (message) {
+            await sendMessage(message, type ?? 'bot');
+          }
+        }
+      }
+      if (beginWorkflow) {
+        await sendMessage(initMessages[0].message);
+        await sendMessage(initMessages[1].message);
+      }
+      setInitChoice(true);
+    },
+    [initChoice, initMessages]
+  );
+
+  const cancelEvent = useCallback(async (event) => {
+    event.preventDefault();
+    await sendMessage('Annuler', 'human');
+    await resetWorkFlow();
   }, []);
 
+  // messages
   const sendMessage = useCallback(
     async (message, type = 'bot') => {
       if (type !== 'bot' && type !== 'human') return;
@@ -192,6 +248,9 @@ const Chatbot = () => {
     [messages]
   );
 
+  /**
+   * handle forms
+   */
   const handleTitle = useCallback(
     (event) => {
       const name = event.target.name;
@@ -230,7 +289,7 @@ const Chatbot = () => {
         const submitted = await ChatbotService.postEvent(res);
         if (submitted === 'success') {
           setEvents([...events, res]);
-          await resetWorkFlow(resetWorkflow);
+          await resetWorkFlow(resetWorkflowMessages, true);
         } else {
           setChoosenEvent({ ...choosenEvent, title: '', date: '' });
           return toast.error(submitted);
@@ -243,27 +302,9 @@ const Chatbot = () => {
     [events, choosenEvent]
   );
 
-  const handleChoice4 = useCallback(
-    async ({ id, option }) => {
-      setWantEntretien(false);
-      await sendMessage(option, 'human');
-      if (id === 1) {
-        await sendMessage('Voici nos disponibilité :');
-        setEventsShow(events.filter((event) => event.type === 'entretien'));
-        setCalendar(true);
-        setChoosenEvent({
-          ...choosenEvent,
-          type: 'entretien'
-        });
-      } else if (id === 2) {
-        for (let elem in endMessages) {
-          await sendMessage(endMessages[elem]);
-        }
-      }
-    },
-    [eventsShow]
-  );
-
+  /**
+   * Show the right component
+   */
   const showUserComponent = useCallback(() => {
     if (initChoice) return <SelectOption options={initOption} chosenOption={handleInitChoice} />;
     else if (choice1) return <EntretienForm submit={needAEntretien} />;
@@ -278,10 +319,28 @@ const Chatbot = () => {
           handleSubmit={handleSubmit}
           handleDatePicker={handleDatePicker}
           handleTitle={handleTitle}
+          cancel={cancelEvent}
         />
       );
   }, [initChoice, choice1, choice2, choice3, calendar, choosenEvent, kilometer, wantEntretien]);
 
+  const showCalendar = useCallback(() => {
+    if (calendar) {
+      return (
+        <Calendar
+          localizer={localizer}
+          events={eventsShow}
+          className="text-slate-800 mt-4"
+          style={{ height: '500px' }}
+        />
+      );
+    }
+    return null;
+  }, [calendar, eventsShow, localizer]);
+
+  /**
+   * Scroll to bottom
+   */
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollTo({
       top: messagesEndRef.current.offsetHeight,
@@ -289,6 +348,9 @@ const Chatbot = () => {
     });
   };
 
+  /**
+   * Get data
+   */
   const getData = useCallback(async () => {
     const data = await ChatbotService.getEvents();
     for (const iterator of data) {
@@ -298,13 +360,16 @@ const Chatbot = () => {
     setEvents(data);
   }, []);
 
+  /**
+   * Watchers
+   */
   useEffect(() => {
     getData();
   }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, calendar, resetWorkFlow]);
 
   return (
     <div className="Chatbot container mx-auto px-4 flex flex-col justify-center items-center">
@@ -325,14 +390,7 @@ const Chatbot = () => {
                   </div>
                 ))}
             </div>
-            {calendar ? (
-              <Calendar
-                localizer={localizer}
-                events={eventsShow}
-                className="text-slate-800 mt-4"
-                style={{ height: '500px' }}
-              />
-            ) : null}
+            {showCalendar()}
           </div>
 
           <div className={style.bottom}>
