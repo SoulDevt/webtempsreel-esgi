@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const ListeSalon = () => {
   // TODO : front
   /*
@@ -49,7 +51,10 @@ const ListeSalon = () => {
             <li className="flex">
               <p className="my-auto">NOM SALON</p>
               <div className="ml-auto">
-                <button> Modifier </button> <button> Supprimer </button>
+                <Link to="/admin/salon/1">
+                  <button> Modifier </button>
+                </Link>
+                <button> Supprimer </button>
               </div>
             </li>
             <hr className="my-1" />
