@@ -1,3 +1,5 @@
+import { NavLink } from 'react-router-dom';
+
 const Home = () => {
   // TODO: front
   /* 
@@ -15,17 +17,16 @@ const Home = () => {
         <div className="mb-3 xl:w-96">
           <select
             className="form-select appearance-none
-      block
-      w-full
-      px-3
-      py-1.5
-      border border-solid border-gray-300
-      rounded
-      transition
-      ease-in-out
-      m-0
-      ">
-            <option className="bg-black" value="true">
+            block
+            w-full
+            px-3
+            py-1.5
+            border border-solid border-gray-300
+            rounded
+            transition
+            ease-in-out
+            m-0">
+            <option className="bg-black teub zeob zob dsd" value="true">
               Disponible
             </option>
             <option selected value="false">
@@ -90,9 +91,11 @@ const Home = () => {
         </div>
       </div>
       <div className="text-center mt-5">
-        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
-          SALONS DE DISCUSSIONS
-        </button>
+        <NavLink to="/admin/liste-salon">
+          <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+            SALONS DE DISCUSSIONS
+          </button>
+        </NavLink>
       </div>
       <div className="m-auto w-3/4 ">
         <p className=""> Notifications commerciales </p>
