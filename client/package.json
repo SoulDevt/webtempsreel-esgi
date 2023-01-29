@@ -10,7 +10,11 @@
     "lint": "eslint --fix . && echo 'Lint complete.'"
   },
   "dependencies": {
+    "dayjs": "^1.11.7",
+    "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
+    "react-big-calendar": "^1.5.2",
+    "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.3",
     "react-toastify": "^9.1.1",

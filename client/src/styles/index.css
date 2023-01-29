@@ -19,6 +19,28 @@
   -webkit-text-size-adjust: 100%;
 }
 
+.scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(199, 214, 228);
+  border-radius: 15px;
+}
+
+
+/* For Chrome, EDGE, Opera, Others */
+.scrollbar::-webkit-scrollbar {
+  width: 5px;
+  border-radius: 15px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(199, 214, 228);
+  border-radius: 15px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

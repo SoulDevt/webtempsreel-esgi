@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { createToken } = require("../lib/jwt");
 const { User } = require("../models");
+const bcryptjs = require("bcryptjs");
 const { ValidationError } = require("sequelize");
 
 const router = new Router();
@@ -13,7 +14,7 @@ router.post("/login", async (req, res) => {
         email: "Email not found",
       });
     }
-    if (user.password !== req.body.password) {
+    if (!(await bcryptjs.compare(req.body.password, user.password))) {
       return res.status(401).json({
         password: "Password is incorrect",
       });
@@ -29,6 +30,14 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
+    const existingUser = await User.findOne({
+      where: { email: req.body.email },
+    });
+    if (existingUser) {
+      return res.status(422).json({
+        email: "Email already exists",
+      });
+    }
     const user = await User.create(req.body);
     res.status(201).json(user);
   } catch (error) {
