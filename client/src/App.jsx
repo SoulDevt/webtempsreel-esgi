@@ -82,7 +82,7 @@ const App = () => {
               index
               element={
                 <RequireAuth>
-                  <HomeAdmin />
+                  <HomeAdmin nbConnexion={nbConnexion} />
                 </RequireAuth>
               }
             />
