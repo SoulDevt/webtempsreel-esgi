@@ -15,7 +15,7 @@ const Login = () => {
   const { accessToken, setAccessToken } = useContext(AppContext);
 
   useEffect(() => {
-    if (accessToken) navigate('/')
+    if (accessToken) navigate('/');
   }, []);
 
   const handleChange = useCallback(
@@ -36,10 +36,15 @@ const Login = () => {
     });
     try {
       const res = await AuthService.login(formData);
-      setAccessToken(getFromToken(res));
+      const data = getFromToken(res);
+      setAccessToken(data);
       setFormData({ email: '', password: '' });
       toast.success('You have been logged in successfully !');
-      navigate('/');
+      if (data.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       toast.error(err.toString());
       // setError(err.response.data);
