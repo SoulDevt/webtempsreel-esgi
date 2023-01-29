@@ -20,15 +20,20 @@ const authInitData = () => {
 
 export const AppContext = createContext({
   accessToken: null,
+  loading: true,
   setAccessToken: () => {}
 });
 
 export const AppContextProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
-  const value = useMemo(() => ({ accessToken, setAccessToken }), [accessToken]);
+  const [loading, setLoading] = useState(true);
+  const value = useMemo(() => ({ accessToken, loading, setAccessToken }), [accessToken]);
   useEffect(() => {
-    const init_data = authInitData();
-    setAccessToken(init_data);
+    if (loading) {
+      const init_data = authInitData();
+      setAccessToken(init_data);
+    }
+    setLoading(false);
   }, []);
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

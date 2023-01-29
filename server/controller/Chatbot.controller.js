@@ -13,7 +13,6 @@ const getEvents = async (req, res, next) => {
 const postEvent = async (req, res, next) => {
   const data = req.body;
   try {
-    // const events = await ChabotEvent.find({ where: { type: data.type } });
     if (
       data.type === "entretien" ||
       data.type === "routier" ||
