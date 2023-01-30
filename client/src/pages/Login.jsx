@@ -13,15 +13,13 @@ const Login = () => {
   });
   const [err, setError] = useState(null);
   const navigate = useNavigate();
-  const { accessToken, setAccessToken } = useContext(AppContext);
-  const [loading, setLoading] = useState(true);
+  const { accessToken, loading, setAccessToken } = useContext(AppContext);
 
   useEffect(() => {
     if (loading) {
       if (accessToken) navigate('/');
     }
-    setLoading(false);
-  }, []);
+  }, [loading, accessToken]);
 
   const handleChange = useCallback(
     (event) => {

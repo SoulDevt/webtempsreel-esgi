@@ -7,7 +7,7 @@ export const getFromToken = (token) => {
   return decoded;
 };
 
-const authInitData = () => {
+export const authInitData = () => {
   if (localStorage.getItem('token')) {
     return {
       token: localStorage.getItem('token'),
