@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useState } from 'react';
+import { AppContext, getFromToken } from '../contexts/app-context';
 
 import io from 'socket.io-client';
 import Chat from './Chat';
+import { useNavigate } from 'react-router-dom';
 const socket = io.connect('http://localhost:9000');
 
 const ChatPage = () => {
   const [userName, setUsername] = useState('');
   const [room, setRoom] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const { accessToken, setAccessToken } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!accessToken) navigate('/')
+  }, []);
+
 
   const joinRoom = () => {
     if (userName !== '' && room !== '') {

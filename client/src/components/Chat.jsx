@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './chat.css';
 import ScrollToBottom from 'react-scroll-to-bottom';
+import { AppContext, getFromToken } from '../contexts/app-context';
 const Chat = ({ socket, username, room }) => {
   const [currentMessage, setCurrentMessage] = useState('');
   const [messageList, setMessageList] = useState([]);
@@ -15,16 +16,18 @@ const Chat = ({ socket, username, room }) => {
       };
 
       await socket.emit('send_message', messageData);
-      setMessageList((list) => [...list, messageData]);
+      setMessageList([...messageList,messageData]);
       setCurrentMessage('');
     }
   };
 
+
+  
   useEffect(() => {
     socket.on('receive_message', (data) => {
-      setMessageList((list) => [...list, data]);
+      setMessageList([...messageList, data]);
     });
-  }, [socket]);
+  }, [socket, messageList]);
 
   return (
     <div className="chat-window">
@@ -33,9 +36,9 @@ const Chat = ({ socket, username, room }) => {
       </div>
       <div className="chat-body">
         <ScrollToBottom className='message-container'>
-          {messageList.map((messageContent) => {
+          {messageList.map((messageContent, index) => {
             return (
-              <div className="message" id={username === messageContent.author ? 'you' : 'other'}>
+              <div key={index} className="message" id={username === messageContent.author ? 'you' : 'other'}>
                 <div>
                   <div className="message-content">
                     <p>{messageContent.message}</p>

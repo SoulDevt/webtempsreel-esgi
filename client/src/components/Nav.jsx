@@ -47,6 +47,14 @@ const Nav = () => {
               </NavLink>
             </li>
             <li className="p-5">
+              <NavLink
+                to="/chat"
+                className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                Chat
+              </NavLink>
+            </li>
+            <li className="p-5">
               <button
                 onClick={logout}
                 className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}>
@@ -70,14 +78,6 @@ const Nav = () => {
                 className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
                 style={({ isActive }) => (isActive ? activeStyle : undefined)}>
                 Register
-              </NavLink>
-            </li>
-            <li className="p-5">
-              <NavLink
-                to="/chat"
-                className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
-                style={({ isActive }) => (isActive ? activeStyle : undefined)}>
-                Chat
               </NavLink>
             </li>
           </>
