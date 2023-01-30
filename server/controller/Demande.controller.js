@@ -1,5 +1,6 @@
-// Fonction pour accepter ou refuser une demande de chat
-app.post("/api/chat/request/:id/:action", (req, res) => {
+const { DemandeCommunication } = require("../models");
+
+const getEvents = async (req, res, next) => {
   const { id, action } = req.params;
   // Vérifier que l'admin est bien celui qui a reçu la demande
   ChatRequest.findById(id, (err, chatRequest) => {
@@ -64,4 +65,13 @@ app.post("/api/chat/request/:id/:action", (req, res) => {
       });
     }
   });
-});
+};
+
+const postEvent = async (req, res, next) => { 
+  const data = req.body;
+}
+
+module.exports = {
+  postEvent,
+  getEvents,
+};
