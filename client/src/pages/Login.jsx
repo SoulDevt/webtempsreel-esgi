@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthService } from '../services';
 import { AppContext, getFromToken } from '../contexts/app-context';
 import { toast } from 'react-toastify';
+import { Loader } from '../components';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -13,9 +14,13 @@ const Login = () => {
   const [err, setError] = useState(null);
   const navigate = useNavigate();
   const { accessToken, setAccessToken } = useContext(AppContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (accessToken) navigate('/');
+    if (loading) {
+      if (accessToken) navigate('/');
+    }
+    setLoading(false);
   }, []);
 
   const handleChange = useCallback(
@@ -51,24 +56,30 @@ const Login = () => {
     }
   };
   return (
-    <div className="auth">
-      <h1>Login</h1>
-      <form action="">
-        <input type="text" placeholder="email" value={formData.email} onChange={handleChange} name="email" />
-        <input
-          type="password"
-          placeholder="password"
-          value={formData.password}
-          onChange={handleChange}
-          name="password"
-        />
-        <button onClick={handleSubmit}>Login</button>
-        {err && <p>{err}</p>}
-        <span>
-          Don't you have an account ? <Link to="/register">Register</Link>
-        </span>
-      </form>
-    </div>
+    <>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="auth">
+          <h1>Login</h1>
+          <form action="">
+            <input type="text" placeholder="email" value={formData.email} onChange={handleChange} name="email" />
+            <input
+              type="password"
+              placeholder="password"
+              value={formData.password}
+              onChange={handleChange}
+              name="password"
+            />
+            <button onClick={handleSubmit}>Login</button>
+            {err && <p>{err}</p>}
+            <span>
+              Don't you have an account ? <Link to="/register">Register</Link>
+            </span>
+          </form>
+        </div>
+      )}
+    </>
   );
 };
 
