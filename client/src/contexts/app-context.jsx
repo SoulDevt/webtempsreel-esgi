@@ -7,7 +7,7 @@ export const getFromToken = (token) => {
   return decoded;
 };
 
-const authInitData = () => {
+export const authInitData = () => {
   if (localStorage.getItem('token')) {
     return {
       token: localStorage.getItem('token'),
@@ -27,7 +27,7 @@ export const AppContext = createContext({
 export const AppContextProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
-  const value = useMemo(() => ({ accessToken, loading, setAccessToken }), [accessToken]);
+  const value = useMemo(() => ({ accessToken, loading, setAccessToken }), [accessToken, loading]);
   useEffect(() => {
     if (loading) {
       const init_data = authInitData();
