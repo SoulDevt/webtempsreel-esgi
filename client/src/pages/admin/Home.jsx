@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import Notification from '../../components/Notification';
+import { Notification } from '../../components';
+
 const Home = ({ nbConnexion }) => {
   function handleChatRequest(chatRequestId, accept) {
     // Envoyer une requête HTTP à l'API pour gérer la demande
