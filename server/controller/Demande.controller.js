@@ -1,20 +1,35 @@
-const { DemandeCommunication } = require("../models");
+const { DemandeCommunication, User } = require("../models");
 
 const getEvents = async (req, res, next) => {
-  const { id, action } = req.params;
   // liste les demandes
-  // try {
-  //   const response = await ChabotEvent.findAll();
-  //   res.status(200).json(response);
-  // } catch (error) {
-  //   res.sendStatus(500);
-  //   console.error(error);
-  // }
+  try {
+    const response = await DemandeCommunication.findAll();
+    res.status(200).json(response);
+  } catch (error) {
+    res.sendStatus(500);
+    console.error(error);
+  }
 };
 
 const postEvent = async (req, res, next) => {
   // creer une demande
   const data = req.body;
+  try {
+    if (data.idUser && data.idAdmin) {
+      const event = await DemandeCommunication.create({
+        type: data.type,
+        title: data.title,
+        start: data.start,
+        end: data.end,
+      });
+      return res.sendStatus(201);
+    } else {
+      return res.status(401).json({ message: "Type d'évènement non reconnu" });
+    }
+  } catch (error) {
+    res.sendStatus(500);
+    console.error(error);
+  }
 };
 
 const deleteDemande = async (req, res, next) => {};

@@ -2,7 +2,6 @@
 const { Model, DataTypes } = require("sequelize");
 const connection = require("./db");
 const bcryptjs = require("bcryptjs");
-const DemandeCommunication = require("./DemandeCommunication.model");
 
 class User extends Model {}
 
@@ -55,8 +54,5 @@ User.addHook("beforeUpdate", async (user, { fields }) => {
     );
   }
 });
-
-User.belongsToMany(DemandeCommunication, { through: "Demande_Admin" });
-User.belongsToMany(DemandeCommunication, { through: "Demande_User" });
 
 module.exports = User;

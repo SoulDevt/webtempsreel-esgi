@@ -3,6 +3,7 @@ import { useCallback, useContext, useState } from 'react';
 import { Notification } from '../../components';
 import { AppContext } from '../../contexts/app-context';
 import { useEffect } from 'react';
+import { serverUrl } from '../../enums';
 
 const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
   const { accessToken, loading } = useContext(AppContext);
@@ -36,9 +37,24 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
   //       // Afficher une notification d'erreur
   //     });
   // }
+  const testDemande = async () => {
+    try {
+      const res = await fetch(`${serverUrl}/demande`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      console.log(data, 'gdhfhjsdghfj');
+      return data;
+    } catch (e) {
+      return e.message;
+    }
+  };
 
   useEffect(() => {
-    console.log(usersAdmin);
+    testDemande();
     if (usersAdmin && usersAdmin.length > 0) {
       usersAdmin.map((admin) => {
         if (admin.id === accessToken.id) {

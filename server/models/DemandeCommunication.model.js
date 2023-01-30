@@ -1,18 +1,26 @@
 const { Model, DataTypes } = require("sequelize");
 const connection = require("./db");
-const User = require("./User.model");
 
 class DemandeCommunication extends Model {}
 
 DemandeCommunication.init(
-  {},
+  {
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      unique: false,
+    },
+    admin_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      unique: false,
+    },
+  },
   {
     sequelize: connection,
     modelName: "demandeCommunication",
     paranoid: false,
   }
 );
-// DemandeCommunication.belongsToMany(User, { through: "Demande_Admin" });
-// DemandeCommunication.belongsToMany(User, { through: "Demande_User" });
 
 module.exports = DemandeCommunication;
