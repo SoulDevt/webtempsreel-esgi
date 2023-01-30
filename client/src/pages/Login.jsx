@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthService } from '../services';
 import { AppContext, getFromToken } from '../contexts/app-context';
 import { toast } from 'react-toastify';
+import { Loader } from '../components';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,11 +13,14 @@ const Login = () => {
   });
   const [err, setError] = useState(null);
   const navigate = useNavigate();
-  const { accessToken, setAccessToken } = useContext(AppContext);
+  const { accessToken, loading, setAccessToken } = useContext(AppContext);
 
   useEffect(() => {
-    if (accessToken) navigate('/')
-  }, []);
+    console.log('loading', loading);
+    if (!loading) {
+      if (accessToken) navigate(accessToken.isAdmin ? '/admin' : '/');
+    }
+  }, [loading, accessToken]);
 
   const handleChange = useCallback(
     (event) => {
@@ -36,34 +40,45 @@ const Login = () => {
     });
     try {
       const res = await AuthService.login(formData);
-      setAccessToken(getFromToken(res));
+      const data = getFromToken(res);
+      setAccessToken(data);
       setFormData({ email: '', password: '' });
       toast.success('You have been logged in successfully !');
-      navigate('/');
+      if (data.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       toast.error(err.toString());
       // setError(err.response.data);
     }
   };
   return (
-    <div className="auth">
-      <h1>Login</h1>
-      <form action="">
-        <input type="text" placeholder="email" value={formData.email} onChange={handleChange} name="email" />
-        <input
-          type="password"
-          placeholder="password"
-          value={formData.password}
-          onChange={handleChange}
-          name="password"
-        />
-        <button onClick={handleSubmit}>Login</button>
-        {err && <p>{err}</p>}
-        <span>
-          Don't you have an account ? <Link to="/register">Register</Link>
-        </span>
-      </form>
-    </div>
+    <>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="auth">
+          <h1>Login</h1>
+          <form action="">
+            <input type="text" placeholder="email" value={formData.email} onChange={handleChange} name="email" />
+            <input
+              type="password"
+              placeholder="password"
+              value={formData.password}
+              onChange={handleChange}
+              name="password"
+            />
+            <button onClick={handleSubmit}>Login</button>
+            {err && <p>{err}</p>}
+            <span>
+              Don't you have an account ? <Link to="/register">Register</Link>
+            </span>
+          </form>
+        </div>
+      )}
+    </>
   );
 };
 

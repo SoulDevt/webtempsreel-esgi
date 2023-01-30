@@ -10,12 +10,15 @@ const Nav = () => {
   const { accessToken, setAccessToken } = useContext(AppContext);
   const navigate = useNavigate();
 
-  const logout = useCallback((e) => {
-    e.preventDefault();
-    localStorage.removeItem('token');
-    setAccessToken(null);
-    navigate('/login');
-  }, [accessToken]);
+  const logout = useCallback(
+    (e) => {
+      e.preventDefault();
+      localStorage.removeItem('token');
+      setAccessToken(null);
+      navigate('/login');
+    },
+    [accessToken]
+  );
 
   return (
     <nav className="bg-white dark:bg-slate-800 w-full h-14">
@@ -38,14 +41,16 @@ const Nav = () => {
         </li>
         {accessToken ? (
           <>
-            <li className="p-5">
-              <NavLink
-                to="/admin/notification"
-                className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
-                style={({ isActive }) => (isActive ? activeStyle : undefined)}>
-                Notification
-              </NavLink>
-            </li>
+            {accessToken.isAdmin && (
+              <li className="p-5">
+                <NavLink
+                  to="/admin/notification"
+                  className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                  style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                  Notification
+                </NavLink>
+              </li>
+            )}
             <li className="p-5">
               <NavLink
                 to="/chat"
