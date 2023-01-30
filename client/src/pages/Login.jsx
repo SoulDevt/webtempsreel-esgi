@@ -16,8 +16,9 @@ const Login = () => {
   const { accessToken, loading, setAccessToken } = useContext(AppContext);
 
   useEffect(() => {
-    if (loading) {
-      if (accessToken) navigate('/');
+    console.log('loading', loading);
+    if (!loading) {
+      if (accessToken) navigate(accessToken.isAdmin ? '/admin' : '/');
     }
   }, [loading, accessToken]);
 

@@ -27,7 +27,7 @@ export const AppContext = createContext({
 export const AppContextProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
-  const value = useMemo(() => ({ accessToken, loading, setAccessToken }), [accessToken]);
+  const value = useMemo(() => ({ accessToken, loading, setAccessToken }), [accessToken, loading]);
   useEffect(() => {
     if (loading) {
       const init_data = authInitData();
