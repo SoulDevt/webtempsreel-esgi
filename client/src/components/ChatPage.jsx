@@ -1,6 +1,8 @@
 import React, { useEffect, useContext } from 'react';
 import { useState } from 'react';
 import { AppContext, getFromToken } from '../contexts/app-context';
+import axios from "axios";
+
 
 import io from 'socket.io-client';
 import Chat from './Chat';
@@ -16,6 +18,8 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (!accessToken) navigate('/')
+    const token = localStorage.getItem('token')
+    const decodedToken = getFromToken(token);
   }, []);
 
 
