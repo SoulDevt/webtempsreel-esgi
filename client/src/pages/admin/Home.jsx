@@ -1,6 +1,29 @@
 import { Link } from 'react-router-dom';
 import Notification from '../../components/Notification';
 const Home = ({ nbConnexion }) => {
+  function handleChatRequest(chatRequestId, accept) {
+    // Envoyer une requête HTTP à l'API pour gérer la demande
+    fetch(`/api/chat/request/${chatRequestId}/${accept ? 'accept' : 'decline'}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          console.log(accept ? 'Demande acceptée' : 'Demande refusée');
+          // Mettre à jour l'interface pour refléter le changement de statut de la demande
+          // Si la demande a été acceptée, ouvrir un salon de chat avec le client
+        } else {
+          console.log('Erreur lors de la gestion de la demande');
+          // Afficher une notification d'erreur
+        }
+      })
+      .catch((error) => {
+        console.log('Erreur lors de la gestion de la demande', error);
+        // Afficher une notification d'erreur
+      });
+  }
+
   // TODO: front
   /* 
     ? interface admin avce liens vers les autres pages
