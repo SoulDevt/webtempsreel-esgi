@@ -1,11 +1,12 @@
 import { useState, useMemo, lazy, Suspense, useEffect, useCallback } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Nav, RequireAuth, ChatPage } from './components';
+import { Nav, RequireAuth } from './components';
 import { io } from 'socket.io-client';
 import { serverUrl } from './enums';
 import { Loader, Toast } from './components';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import ChatPage from './components/ChatPage';
 import { AppContextProvider, authInitData } from './contexts/app-context';
 
 // pages

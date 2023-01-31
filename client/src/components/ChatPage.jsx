@@ -20,6 +20,9 @@ const ChatPage = () => {
     if (!accessToken) navigate('/')
     const token = localStorage.getItem('token')
     const decodedToken = getFromToken(token);
+    const username = decodedToken.name;
+    console.log(decodedToken)
+    setUsername(username);
   }, []);
 
 
@@ -34,13 +37,13 @@ const ChatPage = () => {
       {!showChat ? (
         <div className="joinChatContainer">
           <h3>Join a chat</h3>
-          <input
+          {/* <input
             type="text"
             placeholder="John..."
             onChange={(e) => {
               setUsername(e.target.value);
             }}
-          />
+          /> */}
           <input
             type="text"
             placeholder="Room ID"
