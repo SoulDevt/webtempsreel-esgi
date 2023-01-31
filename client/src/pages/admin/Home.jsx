@@ -69,7 +69,7 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
       if (loading) return;
       const { value } = e.target;
       setIsAvailable(value);
-      handleAdmins({ id: accessToken.id, isAvailable: value });
+      handleAdmins({ id: accessToken.id, name: accessToken.name, isAvailable: value });
     },
     [loading, accessToken]
   );
@@ -103,7 +103,7 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
         </div>
       </div>
       <div className="m-auto w-3/4 ">
-        <p> Demande de communication </p>
+        <p> Demande(s) de communication </p>
         <div className="border p-2 max-h-64 overflow-scroll">
           <ul>
             {dataDemandes.length > 0 ? (

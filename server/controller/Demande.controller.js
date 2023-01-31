@@ -28,7 +28,7 @@ const getDemande = async (req, res, next) => {
   }
 };
 
-const postEvent = async (req, res, next) => {
+const postDemande = async (req, res, next) => {
   // creer une demande
   const data = req.body;
   try {

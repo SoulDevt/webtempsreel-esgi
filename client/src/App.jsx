@@ -24,7 +24,6 @@ const App = () => {
   const [listenning, setListenning] = useState(false);
   const [nbConnexion, setNbConnexion] = useState(null);
   const [adminAvailable, setAdminAvailable] = useState([]);
-
   // const socket = useMemo(() => io(serverUrl), []);
   const socketAdmin = useMemo(() => io(`${serverUrl}/admins`), []);
 
@@ -80,9 +79,9 @@ const App = () => {
   }, []);
 
   const handleStatusAdmin = useCallback(
-    ({ id, isAvailable }) => {
+    ({ id, name, isAvailable }) => {
       if (isAvailable === 'true') {
-        socketAdmin.emit('add', id);
+        socketAdmin.emit('add', { id, name });
       } else {
         socketAdmin.emit('remove', id);
       }
@@ -93,21 +92,10 @@ const App = () => {
   return (
     <Suspense fallback={<Loader />}>
       <AppContextProvider>
-        <Nav />
+        <Nav socket={socketAdmin} />
         <ToastContainer />
-        {adminAvailable.length > 0 && (
-          <p>
-            {adminAvailable.map((admin) => (
-              <div key={admin.id} className="flex items-center">
-                <div className={`w-3 h-3 rounded-full mr-2 ${admin.isAvailable ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span>{admin.id}</span>
-              </div>
-            ))}
-          </p>
-        )}
         <Routes>
-          <Route exact path="/" element={<Home />} />
-
+          <Route exact path="/" element={<Home listAdmin={adminAvailable} socket={socketAdmin} />} />
           <Route path="admin">
             <Route
               index
