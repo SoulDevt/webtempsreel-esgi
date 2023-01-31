@@ -19,6 +19,7 @@ const ChatBot = lazy(() => import('./pages/ChatBot'));
 const ListeSalon = lazy(() => import('./pages/admin/ListeSalon'));
 const Salon = lazy(() => import('./pages/admin/Salon'));
 const HomeAdmin = lazy(() => import('./pages/admin/Home'));
+const Messagerie = lazy(() => import('./pages/admin/Messagerie'));
 
 const App = () => {
   const [listenning, setListenning] = useState(false);
@@ -118,6 +119,14 @@ const App = () => {
               element={
                 <RequireAuth>
                   <Salon />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="messagerie"
+              element={
+                <RequireAuth>
+                  <Messagerie socket={socketAdmin} />
                 </RequireAuth>
               }
             />

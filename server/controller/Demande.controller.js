@@ -65,7 +65,6 @@ const deleteDemande = async (req, res, next) => {
 };
 
 module.exports = {
-  postEvent,
   getEvents,
   deleteDemande,
   getDemande,

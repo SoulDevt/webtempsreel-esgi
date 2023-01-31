@@ -53,6 +53,32 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
     }
   };
 
+  const acceptDemande = async (e, demande) => {
+    e.preventDefault();
+    console.log(demande);
+    try {
+      const res = await fetch(`${serverUrl}/admin/chatlist/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          admin_id: accessToken.id,
+          user_id: demande.user_id
+        })
+      });
+      const data = await res.json();
+      if (data.error) {
+        console.log(data.error);
+        return data.error;
+      }
+      getDemandes();
+    } catch (e) {
+      console.log(e);
+      return e.message;
+    }
+  };
+
   useEffect(() => {
     if (usersAdmin && usersAdmin.length > 0) {
       usersAdmin.map((admin) => {
@@ -112,7 +138,7 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
                   <li className="flex">
                     <p className="my-auto">Id de la demande : {demande.id}</p>
                     <div className="ml-auto">
-                      <button> Accepter </button>
+                      <button onClick={(e) => acceptDemande(e, demande)}> Accepter </button>
                       <button onClick={(e) => deleteDemande(e, demande.id)}> Refuser </button>
                     </div>
                   </li>
