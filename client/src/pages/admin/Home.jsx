@@ -8,45 +8,45 @@ import { serverUrl } from '../../enums';
 const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
   const { accessToken, loading } = useContext(AppContext);
   const [isAvailable, setIsAvailable] = useState(false);
+  const [dataDemandes, setDataDemandes] = useState({});
   // TODO: frontxxx
   /*
     ? interface admin avce liens vers les autres pages
     ? bouton pour se mettre disponible pour le chat
     ? emettre notif
   */
-
-  // function handleChatRequest(chatRequestId, accept) {
-  //   // Envoyer une requête HTTP à l'API pour gérer la demande
-  //   fetch(`/api/chat/request/${chatRequestId}/${accept ? 'accept' : 'decline'}`, {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' }
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       if (data.success) {
-  //         console.log(accept ? 'Demande acceptée' : 'Demande refusée');
-  //         // Mettre à jour l'interface pour refléter le changement de statut de la demande
-  //         // Si la demande a été acceptée, ouvrir un salon de chat avec le client
-  //       } else {
-  //         console.log('Erreur lors de la gestion de la demande');
-  //         // Afficher une notification d'erreur
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.log('Erreur lors de la gestion de la demande', error);
-  //       // Afficher une notification d'erreur
-  //     });
-  // }
-  const testDemande = async () => {
+  const deleteDemande = async (e, id) => {
+    e.preventDefault();
     try {
       const res = await fetch(`${serverUrl}/demande`, {
-        method: 'GET',
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          id: id
+        })
+      });
+      setDataDemandes(getDemandes());
+    } catch (e) {
+      console.log(e);
+      return e.message;
+    }
+  };
+
+  const getDemandes = async () => {
+    try {
+      const res = await fetch(`${serverUrl}/demande`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          admin_id: accessToken.id
+        })
       });
       const data = await res.json();
-      console.log(data, 'gdhfhjsdghfj');
+      setDataDemandes(data);
       return data;
     } catch (e) {
       return e.message;
@@ -54,7 +54,6 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
   };
 
   useEffect(() => {
-    testDemande();
     if (usersAdmin && usersAdmin.length > 0) {
       usersAdmin.map((admin) => {
         if (admin.id === accessToken.id) {
@@ -62,6 +61,7 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
         }
       });
     }
+    getDemandes();
   }, [usersAdmin]);
 
   const handleStatus = useCallback(
@@ -106,54 +106,22 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
         <p> Demande de communication </p>
         <div className="border p-2 max-h-64 overflow-scroll">
           <ul>
-            <li className="flex">
-              <p className="my-auto">NOM UTILISATEUR</p>
-              <div className="ml-auto">
-                <button> Accepter </button> <button> Refuser </button>
-              </div>
-            </li>
-            <hr className="my-1" />
-            <li className="flex">
-              <p className="my-auto">NOM UTILISATEUR</p>
-              <div className="ml-auto">
-                <button> Accepter </button> <button> Refuser </button>
-              </div>
-            </li>
-            <hr className="my-1" />
-            <li className="flex">
-              <p className="my-auto">NOM UTILISATEUR</p>
-              <div className="ml-auto">
-                <button> Accepter </button> <button> Refuser </button>
-              </div>
-            </li>
-            <hr className="my-1" />
-            <li className="flex">
-              <p className="my-auto">NOM UTILISATEUR</p>
-              <div className="ml-auto">
-                <button> Accepter </button> <button> Refuser </button>
-              </div>
-            </li>
-            <hr className="my-1" />
-            <li className="flex">
-              <p className="my-auto">NOM UTILISATEUR</p>
-              <div className="ml-auto">
-                <button> Accepter </button> <button> Refuser </button>
-              </div>
-            </li>
-            <hr className="my-1" />
-            <li className="flex">
-              <p className="my-auto">NOM UTILISATEUR</p>
-              <div className="ml-auto">
-                <button> Accepter </button> <button> Refuser </button>
-              </div>
-            </li>
-            <hr className="my-1" />
-            <li className="flex">
-              <p className="my-auto">NOM UTILISATEUR</p>
-              <div className="ml-auto">
-                <button> Accepter </button> <button> Refuser </button>
-              </div>
-            </li>
+            {dataDemandes.length > 0 ? (
+              dataDemandes.map((demande) => (
+                <div key={demande.id}>
+                  <li className="flex">
+                    <p className="my-auto">Id de la demande : {demande.id}</p>
+                    <div className="ml-auto">
+                      <button> Accepter </button>
+                      <button onClick={(e) => deleteDemande(e, demande.id)}> Refuser </button>
+                    </div>
+                  </li>
+                  <hr className="my-1" />
+                </div>
+              ))
+            ) : (
+              <p> Aucune demande </p>
+            )}
           </ul>
         </div>
       </div>

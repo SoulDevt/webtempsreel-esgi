@@ -4,6 +4,7 @@ const { DemandeController } = require("../controller");
 const router = Router();
 
 router.get("/", DemandeController.getEvents);
-router.post("/", DemandeController.postEvent);
+router.post("/", DemandeController.getDemande);
+router.delete("/", DemandeController.deleteDemande);
 
 module.exports = router;
