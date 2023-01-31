@@ -42,6 +42,7 @@ const Nav = () => {
         {accessToken ? (
           <>
             {accessToken.isAdmin && (
+              <>             
               <li className="p-5">
                 <NavLink
                   to="/admin/notification"
@@ -49,7 +50,19 @@ const Nav = () => {
                   style={({ isActive }) => (isActive ? activeStyle : undefined)}>
                   Notification
                 </NavLink>
+                
               </li>
+              <li className="p-5">
+                <NavLink
+                  to="/admin/liste-salon"
+                  className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                  style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                  Salons
+                </NavLink>
+                
+              </li>
+              </>
+              
             )}
             <li className="p-5">
               <NavLink
