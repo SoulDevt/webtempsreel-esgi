@@ -6,6 +6,7 @@ import { serverUrl } from './enums';
 import { Loader, Toast } from './components';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import ChatPage from './components/ChatPage';
 import { AppContextProvider, authInitData } from './contexts/app-context';
 
 // pages
@@ -140,6 +141,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/chatbot" element={<ChatBot />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="*" element={<Error />} />
         </Routes>
       </AppContextProvider>
