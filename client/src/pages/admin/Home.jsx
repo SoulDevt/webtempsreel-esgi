@@ -5,7 +5,7 @@ import { AppContext } from '../../contexts/app-context';
 import { useEffect } from 'react';
 import { serverUrl } from '../../enums';
 
-const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
+const Home = ({ nbConnexion, usersAdmin, handleAdmins, socket }) => {
   const { accessToken, loading } = useContext(AppContext);
   const [isAvailable, setIsAvailable] = useState(false);
   const [dataDemandes, setDataDemandes] = useState({});
@@ -15,6 +15,11 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
     ? bouton pour se mettre disponible pour le chat
     ? emettre notif
   */
+  useEffect(() => {
+    socket.on('get_demandes', () => {
+      getDemandes();
+    });
+  }, [socket]);
   const deleteDemande = async (e, id) => {
     e.preventDefault();
     try {
@@ -27,7 +32,7 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins }) => {
           id: id
         })
       });
-      setDataDemandes(getDemandes());
+      getDemandes();
     } catch (e) {
       console.log(e);
       return e.message;

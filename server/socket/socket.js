@@ -26,6 +26,10 @@ const adminSocket = (io) => {
       socket.broadcast.emit("get", users);
       console.log("Admin disconnected", users);
     });
+
+    socket.on("get_demandes", () => {
+      socket.broadcast.emit("get_demandes");
+    });
   });
 };
 
