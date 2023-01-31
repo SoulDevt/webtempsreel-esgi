@@ -101,7 +101,12 @@ const App = () => {
               index
               element={
                 <RequireAuth>
-                  <HomeAdmin nbConnexion={nbConnexion} usersAdmin={adminAvailable} handleAdmins={handleStatusAdmin} />
+                  <HomeAdmin
+                    nbConnexion={nbConnexion}
+                    usersAdmin={adminAvailable}
+                    handleAdmins={handleStatusAdmin}
+                    socket={socketAdmin}
+                  />
                 </RequireAuth>
               }
             />
