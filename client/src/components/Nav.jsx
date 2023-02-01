@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useCallback, useContext } from 'react';
 import { AppContext } from '../contexts/app-context';
 
-const Nav = () => {
+const Nav = ({ socket }) => {
   const activeStyle = {
     textDecoration: 'underline'
   };
@@ -13,6 +13,9 @@ const Nav = () => {
   const logout = useCallback(
     (e) => {
       e.preventDefault();
+      if (accessToken.isAdmin) {
+        socket.emit('remove', accessToken.id);
+      }
       localStorage.removeItem('token');
       setAccessToken(null);
       navigate('/login');
@@ -42,15 +45,42 @@ const Nav = () => {
         {accessToken ? (
           <>
             {accessToken.isAdmin && (
-              <li className="p-5">
-                <NavLink
-                  to="/admin/notification"
-                  className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
-                  style={({ isActive }) => (isActive ? activeStyle : undefined)}>
-                  Notification
-                </NavLink>
-              </li>
+              <>
+                <li className="p-5">
+                  <NavLink
+                    to="/admin"
+                    className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                    style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                    end>
+                    Panneau de gestion
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/admin/messagerie"
+                    className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                    style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                    Messagerie
+                  </NavLink>
+                </li>
+                <li className="p-5">
+                  <NavLink
+                    to="/admin/liste-salon"
+                    className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                    style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                    Salons
+                  </NavLink>
+                </li>
+              </>
             )}
+            <li className="p-5">
+              <NavLink
+                to="/chat"
+                className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                Chat
+              </NavLink>
+            </li>
             <li className="p-5">
               <button
                 onClick={logout}

@@ -6,6 +6,7 @@ import { serverUrl } from './enums';
 import { Loader, Toast } from './components';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import ChatPage from './components/ChatPage';
 import { AppContextProvider, authInitData } from './contexts/app-context';
 
 // pages
@@ -14,19 +15,19 @@ const Error = lazy(() => import('./pages/Error'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ChatBot = lazy(() => import('./pages/ChatBot'));
+const MesMessages = lazy(() => import('./pages/MesMessages'));
 
 // pages - admin
 const ListeSalon = lazy(() => import('./pages/admin/ListeSalon'));
 const Salon = lazy(() => import('./pages/admin/Salon'));
 const HomeAdmin = lazy(() => import('./pages/admin/Home'));
-const Notification = lazy(() => import('./pages/Notification'));
+const Messagerie = lazy(() => import('./pages/admin/Messagerie'));
 
 const App = () => {
   const [listenning, setListenning] = useState(false);
   const [nbConnexion, setNbConnexion] = useState(null);
   const [adminAvailable, setAdminAvailable] = useState([]);
-
-  // const socket = useMemo(() => io(serverUrl), []);
+  const socketMessagerie = useMemo(() => io(`${serverUrl}/messagerie`), []);
   const socketAdmin = useMemo(() => io(`${serverUrl}/admins`), []);
 
   useEffect(() => {
@@ -81,9 +82,9 @@ const App = () => {
   }, []);
 
   const handleStatusAdmin = useCallback(
-    ({ id, isAvailable }) => {
+    ({ id, name, isAvailable }) => {
       if (isAvailable === 'true') {
-        socketAdmin.emit('add', id);
+        socketAdmin.emit('add', { id, name });
       } else {
         socketAdmin.emit('remove', id);
       }
@@ -94,27 +95,26 @@ const App = () => {
   return (
     <Suspense fallback={<Loader />}>
       <AppContextProvider>
-        <Nav />
+        <Nav socket={socketAdmin} />
         <ToastContainer />
-        {adminAvailable.length > 0 && (
-          <p>
-            {adminAvailable.map((admin) => (
-              <div key={admin.id} className="flex items-center">
-                <div className={`w-3 h-3 rounded-full mr-2 ${admin.isAvailable ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span>{admin.id}</span>
-              </div>
-            ))}
-          </p>
-        )}
         <Routes>
-          <Route exact path="/" element={<Home />} />
-
+          <Route exact path="/" element={<Home listAdmin={adminAvailable} socket={socketAdmin} />} />
+          <Route
+            exact
+            path="/messagerie/:room"
+            element={<MesMessages listAdmin={adminAvailable} socket={socketAdmin} />}
+          />
           <Route path="admin">
             <Route
               index
               element={
                 <RequireAuth>
-                  <HomeAdmin nbConnexion={nbConnexion} usersAdmin={adminAvailable} handleAdmins={handleStatusAdmin} />
+                  <HomeAdmin
+                    nbConnexion={nbConnexion}
+                    usersAdmin={adminAvailable}
+                    handleAdmins={handleStatusAdmin}
+                    socket={socketAdmin}
+                  />
                 </RequireAuth>
               }
             />
@@ -135,10 +135,10 @@ const App = () => {
               }
             />
             <Route
-              path="notification"
+              path="messagerie"
               element={
                 <RequireAuth>
-                  <Notification nbConnexion={nbConnexion} />
+                  <Messagerie socket={socketAdmin} />
                 </RequireAuth>
               }
             />
@@ -147,6 +147,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/chatbot" element={<ChatBot />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="*" element={<Error />} />
         </Routes>
       </AppContextProvider>
