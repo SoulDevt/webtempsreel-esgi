@@ -100,7 +100,6 @@ const App = () => {
         <Routes>
           <Route exact path="/" element={<Home listAdmin={adminAvailable} socket={socketAdmin} />} />
           <Route
-            exact
             path="/messagerie/:room"
             element={<MesMessages listAdmin={adminAvailable} socket={socketAdmin} />}
           />

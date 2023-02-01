@@ -25,7 +25,7 @@ AdminChatList.init(
     },
     url: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: true,
       },

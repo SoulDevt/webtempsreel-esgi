@@ -58,7 +58,27 @@ const deleteChatList = async (req, res) => {
   }
 };
 
+const getChat = async (req, res) => {
+  const data = req.body;
+  if (!data.url || typeof data.url !== "string") {
+    return res.status(401).json({ message: "pas de paramètre dans l'url" });
+  }
+  try {
+    const response = await AdminChatList.findOne({
+      where: {
+        url: data.url,
+      }
+    });
+    res.status(200).json(response);
+  } catch (error) {
+    res.sendStatus(500);
+    console.error(error);
+  }
+};
+
+
 module.exports = {
+  getChat,
   getChatList,
   postChatList,
   deleteChatList,

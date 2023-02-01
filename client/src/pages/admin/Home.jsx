@@ -4,17 +4,13 @@ import { Notification } from '../../components';
 import { AppContext } from '../../contexts/app-context';
 import { useEffect } from 'react';
 import { serverUrl } from '../../enums';
+import { toast } from 'react-toastify';
 
 const Home = ({ nbConnexion, usersAdmin, handleAdmins, socket }) => {
   const { accessToken, loading } = useContext(AppContext);
   const [isAvailable, setIsAvailable] = useState(false);
   const [dataDemandes, setDataDemandes] = useState({});
-  // TODO: frontxxx
-  /*
-    ? interface admin avce liens vers les autres pages
-    ? bouton pour se mettre disponible pour le chat
-    ? emettre notif
-  */
+
   useEffect(() => {
     socket.on('get_demandes', () => {
       getDemandes();
@@ -61,7 +57,6 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins, socket }) => {
 
   const acceptDemande = async (e, demande) => {
     e.preventDefault();
-    console.log(demande);
     try {
       const res = await fetch(`${serverUrl}/admin/chatlist/create`, {
         method: 'POST',
@@ -78,8 +73,11 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins, socket }) => {
         console.log(data.error);
         return data.error;
       }
+      deleteDemande();
       getDemandes();
       socket.emit('get_demandes_user');
+      socket.emit('create_chatlist');
+      toast.success('Demande acceptée');
     } catch (e) {
       console.log(e);
       return e.message;
@@ -166,6 +164,13 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins, socket }) => {
         </Link>
       </div>
       <Notification nbConnexion={nbConnexion} />
+      <div className="text-center mt-5">
+        <Link to="/admin/messagerie">
+          <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+            Chatliste
+          </button>
+        </Link>
+      </div>
     </div>
   );
 };

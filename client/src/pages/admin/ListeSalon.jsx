@@ -11,13 +11,12 @@ const ListeSalon = () => {
     ? lien vers la gestion des salons
   */
   const [rooms, setRooms] = useState([]);
-  const [title, setTitle] = useState()
+  const [title, setTitle] = useState();
   const [limits, setLimits] = useState();
-  const [inputs,setInputs] = useState({
+  const [inputs, setInputs] = useState({
     title: '',
     limits: ''
-  })
-
+  });
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -27,24 +26,21 @@ const ListeSalon = () => {
     };
 
     fetchRooms();
-  });
+  }, []);
 
   const handleChange = (e) => {
-    setInputs(prev => ({ ...prev, [e.target.name]: e.target.value}))
-    console.log(inputs)
-  }
-
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    console.log(inputs);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post('http://localhost:9000/salons/create', inputs);
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
-  }
+  };
   return (
     <div className="container mx-auto">
       <div className="home-admin px-4 flex flex-col justify-center items-center">
@@ -55,33 +51,36 @@ const ListeSalon = () => {
         <div className="border p-2 max-h-64 overflow-scroll">
           <form>
             <div>
-              <label for="titleRoom" class="flex justify-center">
+              <label htmlFor="titleRoom" className="flex justify-center">
                 Nom du salon
               </label>
               <input
                 onChange={handleChange}
                 type="text"
                 id="titleRoom"
-                name='title'
-                class="mx-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-2/4 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                name="title"
+                className="mx-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-2/4 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 required
               />
             </div>
             <div>
-              <label for="limitMaxUser" class="flex justify-center">
+              <label htmlFor="limitMaxUser" className="flex justify-center">
                 Limite de places
               </label>
               <input
-                name='limits'
+                name="limits"
                 onChange={handleChange}
                 type="number"
                 id="limitMaxUser"
                 min="2"
                 max="20"
-                class="mx-auto block p-2.5 w-2/4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
+                className="mx-auto block p-2.5 w-2/4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></input>
             </div>
             <div className="m-auto w-3/4 flex justify-center mt-2">
-              <button className="text-center w-1/4" onClick={handleSubmit}> Créer </button>
+              <button className="text-center w-1/4" onClick={handleSubmit}>
+                {' '}
+                Créer{' '}
+              </button>
             </div>
           </form>
         </div>

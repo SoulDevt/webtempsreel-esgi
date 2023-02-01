@@ -1,11 +1,12 @@
 import { useEffect, useContext, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../../enums';
 import { AppContext } from '../../contexts/app-context';
 
 const Messagerie = ({ socket }) => {
   const { accessToken, setAccessToken } = useContext(AppContext);
   const [chatList, setChatList] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getChatList();
@@ -36,12 +37,12 @@ const Messagerie = ({ socket }) => {
       return e.message;
     }
   };
-    
-    const openChat = async (e, url) => {
-        e.preventDefault();
-        socket.emit('join_room', url);
-        Navigate(`/messagerie/${url}`)
-    }
+
+  const openChat = async (e, url) => {
+    e.preventDefault();
+    socket.emit('join_room', url);
+    navigate(`/messagerie/${url}`);
+  };
 
   return (
     <div className="container mx-auto">
@@ -49,12 +50,12 @@ const Messagerie = ({ socket }) => {
         <h1>Messagerie</h1>
       </div>
       {chatList && chatList.length > 0 ? (
-        chatList.map((elem) => (
-          <div>
+        chatList.map((elem, index) => (
+          <div key={index}>
             <li className="flex">
               <p className="my-auto">id user : {elem.user_id}</p>
               <div className="ml-auto">
-                <button className="btn btn-primary" onClick={(e)=>openChat(e,elem.url)}>
+                <button className="btn btn-primary" onClick={(e) => openChat(e, elem.url)}>
                   Ouvrir
                 </button>
               </div>
