@@ -15,6 +15,7 @@ const Error = lazy(() => import('./pages/Error'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ChatBot = lazy(() => import('./pages/ChatBot'));
+const MesMessages = lazy(() => import('./pages/MesMessages'));
 
 // pages - admin
 const ListeSalon = lazy(() => import('./pages/admin/ListeSalon'));
@@ -26,7 +27,7 @@ const App = () => {
   const [listenning, setListenning] = useState(false);
   const [nbConnexion, setNbConnexion] = useState(null);
   const [adminAvailable, setAdminAvailable] = useState([]);
-  // const socket = useMemo(() => io(serverUrl), []);
+  const socketMessagerie = useMemo(() => io(`${serverUrl}/messagerie`), []);
   const socketAdmin = useMemo(() => io(`${serverUrl}/admins`), []);
 
   useEffect(() => {
@@ -98,6 +99,11 @@ const App = () => {
         <ToastContainer />
         <Routes>
           <Route exact path="/" element={<Home listAdmin={adminAvailable} socket={socketAdmin} />} />
+          <Route
+            exact
+            path="/messagerie/:room"
+            element={<MesMessages listAdmin={adminAvailable} socket={socketAdmin} />}
+          />
           <Route path="admin">
             <Route
               index

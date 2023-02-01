@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './chat.css';
 import ScrollToBottom from 'react-scroll-to-bottom';
-import { AppContext, getFromToken } from '../contexts/app-context';
+
 const Chat = ({ socket, username, room }) => {
   const [currentMessage, setCurrentMessage] = useState('');
   const [messageList, setMessageList] = useState([]);
