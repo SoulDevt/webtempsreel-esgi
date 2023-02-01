@@ -15,6 +15,11 @@ DemandeCommunication.init(
       allowNull: false,
       unique: false,
     },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: false,
+    },
   },
   {
     sequelize: connection,

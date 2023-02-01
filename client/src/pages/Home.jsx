@@ -6,6 +6,7 @@ const Home = ({ listAdmin, socket }) => {
   const [count, setCount] = useState(0);
   const { accessToken, loading, setAccessToken } = useContext(AppContext);
   const [dataDemandes, setDataDemandes] = useState({});
+  const [checkValue, setCheckValue] = useState(0);
 
   const postDemande = async (e, admin_id) => {
     e.preventDefault();
@@ -17,7 +18,8 @@ const Home = ({ listAdmin, socket }) => {
         },
         body: JSON.stringify({
           admin_id: admin_id,
-          user_id: accessToken.id
+          user_id: accessToken.id,
+          status: 'En attente'
         })
       });
       console.log(res);
@@ -55,6 +57,7 @@ const Home = ({ listAdmin, socket }) => {
       getDemandeByUser();
     }
   }, [socket, accessToken]);
+  let test = true;
 
   return (
     <div className="Home container mx-auto px-4 flex flex-col justify-center items-center">
@@ -80,17 +83,13 @@ const Home = ({ listAdmin, socket }) => {
                               <div className="ml-auto">
                                 {dataDemandes && dataDemandes.length > 0
                                   ? dataDemandes.map((demande) => {
-                                      if (demande.admin_id === admin.id) {
+                                      if (demande.admin_id === admin.id && demande.status === 'En attente') {
+                                        test = false;
                                         return <p key={demande.id}> En attente </p>;
-                                      } else {
-                                        return (
-                                          <button key={demande.id} onClick={(e) => postDemande(e, admin.id)}>
-                                            Envoyer demande
-                                          </button>
-                                        );
                                       }
                                     })
                                   : null}
+                                {test && <button onClick={(e) => postDemande(e, admin.id)}>Envoyer demande</button>}
                               </div>
                             </li>
                             <hr className="my-1" />

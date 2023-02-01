@@ -63,6 +63,7 @@ const postDemande = async (req, res, next) => {
         admin_id: data.admin_id,
         createdAt: data.createdAt,
         updateAt: data.updateAt,
+        status: data.status,
       });
       return res.sendStatus(201);
     } else {
