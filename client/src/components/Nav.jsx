@@ -45,15 +45,42 @@ const Nav = ({ socket }) => {
         {accessToken ? (
           <>
             {accessToken.isAdmin && (
-              <li className="p-5">
-                <NavLink
-                  to="/admin"
-                  className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
-                  style={({ isActive }) => (isActive ? activeStyle : undefined)}>
-                  Panneau de gestion
-                </NavLink>
-              </li>
+              <>
+                <li className="p-5">
+                  <NavLink
+                    to="/admin"
+                    className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                    style={({ isActive }) => (isActive ? activeStyle : undefined)}
+                    end>
+                    Panneau de gestion
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/admin/messagerie"
+                    className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                    style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                    Messagerie
+                  </NavLink>
+                </li>
+                <li className="p-5">
+                  <NavLink
+                    to="/admin/liste-salon"
+                    className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                    style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                    Salons
+                  </NavLink>
+                </li>
+              </>
             )}
+            <li className="p-5">
+              <NavLink
+                to="/chat"
+                className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+                Chat
+              </NavLink>
+            </li>
             <li className="p-5">
               <button
                 onClick={logout}

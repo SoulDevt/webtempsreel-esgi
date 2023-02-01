@@ -6,6 +6,7 @@ import { serverUrl } from './enums';
 import { Loader, Toast } from './components';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import ChatPage from './components/ChatPage';
 import { AppContextProvider, authInitData } from './contexts/app-context';
 
 // pages
@@ -14,17 +15,19 @@ const Error = lazy(() => import('./pages/Error'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ChatBot = lazy(() => import('./pages/ChatBot'));
+const MesMessages = lazy(() => import('./pages/MesMessages'));
 
 // pages - admin
 const ListeSalon = lazy(() => import('./pages/admin/ListeSalon'));
 const Salon = lazy(() => import('./pages/admin/Salon'));
 const HomeAdmin = lazy(() => import('./pages/admin/Home'));
+const Messagerie = lazy(() => import('./pages/admin/Messagerie'));
 
 const App = () => {
   const [listenning, setListenning] = useState(false);
   const [nbConnexion, setNbConnexion] = useState(null);
   const [adminAvailable, setAdminAvailable] = useState([]);
-  // const socket = useMemo(() => io(serverUrl), []);
+  const socketMessagerie = useMemo(() => io(`${serverUrl}/messagerie`), []);
   const socketAdmin = useMemo(() => io(`${serverUrl}/admins`), []);
 
   useEffect(() => {
@@ -96,6 +99,11 @@ const App = () => {
         <ToastContainer />
         <Routes>
           <Route exact path="/" element={<Home listAdmin={adminAvailable} socket={socketAdmin} />} />
+          <Route
+            exact
+            path="/messagerie/:room"
+            element={<MesMessages listAdmin={adminAvailable} socket={socketAdmin} />}
+          />
           <Route path="admin">
             <Route
               index
@@ -126,11 +134,20 @@ const App = () => {
                 </RequireAuth>
               }
             />
+            <Route
+              path="messagerie"
+              element={
+                <RequireAuth>
+                  <Messagerie socket={socketAdmin} />
+                </RequireAuth>
+              }
+            />
           </Route>
 
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/chatbot" element={<ChatBot />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="*" element={<Error />} />
         </Routes>
       </AppContextProvider>
