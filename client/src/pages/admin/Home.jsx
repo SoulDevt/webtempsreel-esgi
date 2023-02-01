@@ -33,6 +33,7 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins, socket }) => {
         })
       });
       getDemandes();
+      socket.emit('get_demandes_user');
     } catch (e) {
       console.log(e);
       return e.message;
@@ -78,6 +79,7 @@ const Home = ({ nbConnexion, usersAdmin, handleAdmins, socket }) => {
         return data.error;
       }
       getDemandes();
+      socket.emit('get_demandes_user');
     } catch (e) {
       console.log(e);
       return e.message;

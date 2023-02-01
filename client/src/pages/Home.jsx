@@ -2,11 +2,8 @@ import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../contexts/app-context';
 import { serverUrl } from '../enums';
 const Home = ({ listAdmin, socket }) => {
-  // const [isLoading, setIsLoading] = useState(true);
-  const [count, setCount] = useState(0);
-  const { accessToken, loading, setAccessToken } = useContext(AppContext);
+  const { accessToken, loading } = useContext(AppContext);
   const [dataDemandes, setDataDemandes] = useState({});
-  const [checkValue, setCheckValue] = useState(0);
 
   const postDemande = async (e, admin_id) => {
     e.preventDefault();
@@ -22,8 +19,8 @@ const Home = ({ listAdmin, socket }) => {
           status: 'En attente'
         })
       });
-      console.log(res);
       socket.emit('get_demandes');
+      getDemandeByUser();
     } catch (e) {
       console.log(e);
       return e.message;
@@ -43,7 +40,6 @@ const Home = ({ listAdmin, socket }) => {
       });
       const data = await res.json();
       setDataDemandes(data);
-      console.log(data);
       return data;
     } catch (e) {
       console.log(e);
@@ -52,11 +48,15 @@ const Home = ({ listAdmin, socket }) => {
   };
 
   useEffect(() => {
-    socket.emit('get');
     if (accessToken && !accessToken.isAdmin) {
       getDemandeByUser();
     }
-  }, [socket, accessToken]);
+    socket.on('get_demandes_user', () => {
+      if (accessToken && !accessToken.isAdmin) {
+        getDemandeByUser();
+      }
+    });
+  }, [socket, accessToken, loading]);
   let test = true;
 
   return (

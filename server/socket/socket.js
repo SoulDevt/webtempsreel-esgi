@@ -30,6 +30,9 @@ const adminSocket = (io) => {
     socket.on("get_demandes", () => {
       socket.broadcast.emit("get_demandes");
     });
+    socket.on("get_demandes_user", () => {
+      socket.broadcast.emit("get_demandes_user");
+    });
   });
 };
 
