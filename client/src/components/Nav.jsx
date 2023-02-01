@@ -63,15 +63,6 @@ const Nav = ({ socket }) => {
                     Messagerie
                   </NavLink>
                 </li>
-
-                <li className="p-5">
-                  <NavLink
-                    to="/admin/notification"
-                    className={'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
-                    style={({ isActive }) => (isActive ? activeStyle : undefined)}>
-                    Notification
-                  </NavLink>
-                </li>
                 <li className="p-5">
                   <NavLink
                     to="/admin/liste-salon"
